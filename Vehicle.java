@@ -1,3 +1,6 @@
+
+
+
 public class Vehicle {
 
     // Essential Fields
@@ -66,6 +69,7 @@ public class Vehicle {
         this.seats = seats;
     }
 
+    // Setters
     public void setNickname(String nickname) {
         this.nickname = nickname;
     }
@@ -74,40 +78,82 @@ public class Vehicle {
         this.isSaved = isSaved;
     }
 
-    public String getVIN() {
-        return VIN;
-    }
 
+    // Getters
     public String getNickname() {
         return nickname;
     }
 
-
-
     public Boolean getSaved() {
         return isSaved;
+    }
+
+    public String getVIN() {
+        return VIN;
+    }
+
+    public String getMake() { return make; }
+
+    public String getModel() { return model; }
+
+    public int getYear() { return year; }
+
+    public String getTrim() { return trim; }
+
+    public String getVehicleType() { return vehicleType; }
+
+    public String getBodyClass() { return bodyClass; }
+
+    public int getDoors() {
+        return doors;
+    }
+
+    public String getFuelTypePrimary() { return fuelTypePrimary; }
+
+    public String getDriveType() { return driveType; }
+
+    public String getEngineModel() { return engineModel; }
+
+    public int getEngineCylinder() {
+        return engineCylinder;
     }
 
     public double getDisplacementL() {
         return displacementL;
     }
 
-    public int getDoors() {
-        return doors;
-    }
+    public String getTransmissionStyle() { return transmissionStyle; }
 
-    public int getEngineCylinder() {
-        return engineCylinder;
+    public int getTransmissionSpeed() { return transmissionSpeed; }
+
+    public String getPlantCountry() { return plantCountry; }
+
+    public String getManufacturer() { return manufacturer; }
+
+    public String getGvwr() { return GVWR; }
+
+    public int getSeatRows() {
+        return seatRows;
     }
 
     public int getSeats() {
         return seats;
     }
 
-    public int getSeatRows() {
-        return seatRows;
+
+    //toString: currently includes logic for a vehicle listing
+    @Override
+    public String toString() {
+        String listing = "";
+        if(isSaved) {
+            listing += "Nickname: " + nickname + "\n";
+        } else {
+            listing += "VIN: " + VIN + "\n";
+        }
+        listing += "Make: " + make + "\n";
+        listing += "Model: " + model + "\n";
+        listing += "Year: " + year + "\n";
+        return listing;
     }
-
-
 }
 
