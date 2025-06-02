@@ -5,7 +5,23 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="29f80552-d54c-41fd-a8d4-ae0b18a30e93" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/jarRepositories.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/VINDecoderCompare.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/VINDecoderCompare.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Vehicle.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Vehicle.java" afterDir="false" />
+    </list>
+    <list id="658dd0c9-9d55-450e-a6aa-3e4c649efb28" name="Changes by holde_apqff49" comment="">
+      <change beforePath="$PROJECT_DIR$/GUIFiles/AnalysisView.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/AnalysisView.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GUIFiles/CompareView.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/CompareView.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GUIFiles/LoginScreen.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/LoginScreen.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GUIFiles/MainView.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/MainView.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GUIFiles/VehiclMenu.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/VehiclMenu.java" afterDir="false" />
+    </list>
+    <list id="00fa75c8-f06e-4eb5-a96d-35640c3ad73c" name="Changes by isaka" comment="">
+      <change beforePath="$PROJECT_DIR$/VINDecoderMain.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/VINDecoderMain.java" afterDir="false" />
     </list>
     <list id="b672b7c6-6dd7-4f9d-8a77-450e69394ff9" name="Changes by saul7" comment="" />
     <option name="SHOW_DIALOG" value="false" />
@@ -40,12 +56,15 @@
     &quot;accountId&quot;: &quot;4bd5bb21-e18a-47f7-bb00-85b0a0a68f4b&quot;
   }
 }</component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="ProjectErrors" />
+  </component>
   <component name="ProjectColorInfo">{
   &quot;customColor&quot;: &quot;&quot;,
   &quot;associatedIndex&quot;: 3
 }</component>
   <component name="ProjectId" id="2xQFtSzQwwo54uOpOTWOcZK3eSU" />
-  <component name="ProjectLevelVcsManager">
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
     <ConfirmationsSetting value="2" id="Add" />
   </component>
   <component name="ProjectViewState">
@@ -59,16 +78,35 @@
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "codeWithMe.voiceChat.enabledByDefault": "false",
     "git-widget-placeholder": "main",
+    "ignore.virus.scanning.warn.message": "true",
     "kotlin-language-version-configured": "true",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "configurable.group.language",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
+  <component name="RunManager">
+    <configuration default="true" type="JetRunConfigurationType">
+      <module name="CS380-Project" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="KotlinStandaloneScriptRunConfigurationType">
+      <module name="CS380-Project" />
+      <option name="filePath" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+  </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
@@ -83,5 +121,9 @@
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="XSLT-Support.FileAssociations.UIState">
+    <expand />
+    <select />
   </component>
 </project>
