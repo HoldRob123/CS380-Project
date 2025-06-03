@@ -1,6 +1,10 @@
+<<<<<<< Updated upstream:Vehicle.java
 
 
 
+=======
+// delete me
+>>>>>>> Stashed changes:src/Vehicle.java
 public class Vehicle {
 
     // Essential Fields

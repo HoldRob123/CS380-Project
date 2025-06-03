@@ -1,3 +1,8 @@
+<<<<<<< Updated upstream:VINDecoderCompare.java
+=======
+// delete me
+
+>>>>>>> Stashed changes:src/VINDecoderCompare.java
 import java.util.ArrayList;
 
 public class VINDecoderCompare extends VINDecoderMain{

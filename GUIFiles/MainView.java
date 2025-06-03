@@ -1,4 +1,8 @@
+<<<<<<< Updated upstream:GUIFiles/MainView.java
 package GUIFiles;
+=======
+// delete me
+>>>>>>> Stashed changes:src/MainView.java
 
 import javax.swing.*;
 import java.awt.*;

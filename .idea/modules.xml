@@ -3,7 +3,11 @@
   <component name="ProjectModuleManager">
     <modules>
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
       <module fileurl="file://$PROJECT_DIR$/.idea/CS380-Project.iml" filepath="$PROJECT_DIR$/.idea/CS380-Project.iml" />
+=======
+      <module fileurl="file://$PROJECT_DIR$/cs380project.iml" filepath="$PROJECT_DIR$/cs380project.iml" />
+>>>>>>> Stashed changes
 =======
       <module fileurl="file://$PROJECT_DIR$/cs380project.iml" filepath="$PROJECT_DIR$/cs380project.iml" />
 >>>>>>> Stashed changes

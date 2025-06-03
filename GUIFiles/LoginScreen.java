@@ -1,4 +1,8 @@
+<<<<<<< Updated upstream:GUIFiles/LoginScreen.java
 package GUIFiles;
+=======
+// delete me
+>>>>>>> Stashed changes:src/LoginScreen.java
 
 import javax.swing.*;
 import java.awt.*;
