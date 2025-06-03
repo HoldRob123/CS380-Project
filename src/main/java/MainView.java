@@ -185,14 +185,14 @@ public class MainView extends JFrame {
         if (!year.isEmpty() && !String.valueOf(v.getYear()).equals(year)) return false;
         if (!make.isEmpty() && !v.getMake().equalsIgnoreCase(make)) return false;
         if (!model.isEmpty() && !v.getModel().equalsIgnoreCase(model)) return false;
-        if (!country.isEmpty() && !v.getCountry().equalsIgnoreCase(country)) return false;
+        if (!country.isEmpty() && !v.getPlantCountry().equalsIgnoreCase(country)) return false;
 
-        if (savedOnly.isSelected() && !v.getIsSaved()) return false;
+        if (savedOnly.isSelected() && !v.getSaved()) return false;
 
         boolean fuelMatch = !gas.isSelected() && !diesel.isSelected() && !ev.isSelected();
-        fuelMatch |= gas.isSelected() && "Gasoline".equalsIgnoreCase(v.getFuelType());
-        fuelMatch |= diesel.isSelected() && "Diesel".equalsIgnoreCase(v.getFuelType());
-        fuelMatch |= ev.isSelected() && "EV".equalsIgnoreCase(v.getFuelType());
+        fuelMatch |= gas.isSelected() && "Gasoline".equalsIgnoreCase(v.getFuelTypePrimary());
+        fuelMatch |= diesel.isSelected() && "Diesel".equalsIgnoreCase(v.getFuelTypePrimary());
+        fuelMatch |= ev.isSelected() && "EV".equalsIgnoreCase(v.getFuelTypePrimary());
 
         return fuelMatch;
     }
