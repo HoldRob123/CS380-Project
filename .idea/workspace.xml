@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="88dd8be3-de38-498f-b64f-c57ba0bfd690" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/src/VINDecoderMain.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/VINDecoderMain.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Vehicle.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Vehicle.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/VINDecoderMain.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/VINDecoderMain.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/Vehicle.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/Vehicle.class" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;jacobhasason&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/HoldRob123/CS380-Project.git&quot;,
+    &quot;accountId&quot;: &quot;4bd5bb21-e18a-47f7-bb00-85b0a0a68f4b&quot;
+  }
+}</component>
+  <component name="ProjectColorInfo">{
+  &quot;customColor&quot;: &quot;&quot;,
+  &quot;associatedIndex&quot;: 3
+}</component>
+  <component name="ProjectId" id="2y0pZlqsIzfpgWenKuxSE7YS8wM" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Application.VINDecoderMain.executor": "Run",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "Isak"
+  }
+}]]></component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="88dd8be3-de38-498f-b64f-c57ba0bfd690" name="Changes" comment="" />
+      <created>1748981404458</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1748981404458</updated>
+    </task>
+    <servers />
+  </component>
+</project>
