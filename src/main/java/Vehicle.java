@@ -1,6 +1,3 @@
-package GUIFiles;
-
-
 public class Vehicle {
 
     // Essential Fields
