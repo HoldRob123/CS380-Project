@@ -15,6 +15,14 @@ public class MainView extends JFrame {
 
     private List<Vehicle> vehicleDatabase;
 
+    private VINDecoderMain mainApp;  // Add this field if not already present
+
+    // Add this constructor below your field declarations
+    public MainView(VINDecoderMain mainApp) {
+        this(); // call the default constructor to reuse the GUI setup
+        this.mainApp = mainApp; // store the reference for future use
+    }
+
     public MainView() {
         setTitle("vBreed Main Screen");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
