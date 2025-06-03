@@ -1,8 +1,5 @@
-package GUIFiles;
 
 import javax.swing.*;
-import java.awt.*;
-import java.awt.event.*;
 
 class MainView extends JFrame {
     private JTextField searchField;

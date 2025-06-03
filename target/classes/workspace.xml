@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="f577a9ca-2393-4ef7-b9b1-13aef765b326" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/src/.idea/.name" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/.idea/compiler.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/.idea/jarRepositories.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/.idea/uiDesigner.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/.idea/workspace.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/cs380project/VINDecoderMain.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/cs380project/pom.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/CS380-Project.iml" beforeDir="false" afterPath="$PROJECT_DIR$/src/.idea/CS380-Project.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/src/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GUIFiles/AnalysisView.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GUIFiles/CompareView.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/cs380project/CompareView.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GUIFiles/LoginScreen.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/cs380project/LoginScreen.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GUIFiles/MainView.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/cs380project/MainView.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GUIFiles/VehiclMenu.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VINDecoderCompare.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/cs380project/VINDecoderCompare.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/VINDecoderMain.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Vehicle.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/cs380project/Vehicle.java" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="Holden" />
+      </map>
+    </option>
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;customColor&quot;: &quot;&quot;,
+  &quot;associatedIndex&quot;: 3
+}</component>
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Application.VINDecoderMain.executor": "Run",
+    "Application.cs380project.VINDecoderMain.executor": "Run",
+    "git-widget-placeholder": "Isak",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "project.structure.last.edited": "Modules",
+    "project.structure.proportion": "0.15",
+    "project.structure.side.proportion": "0.2",
+    "settings.editor.selected.configurable": "preferences.pluginManager"
+  },
+  "keyToStringList": {
+    "DatabaseDriversLRU": [
+      "mysql"
+    ]
+  }
+}]]></component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\isaka\OneDrive\Documents\GitHub\CS380-Project\src\.idea" />
+      <recent name="C:\Users\isaka\OneDrive\Documents\GitHub\CS380-Project\src" />
+      <recent name="C:\Users\isaka\OneDrive\Documents\GitHub\src" />
+      <recent name="C:\Users\isaka\OneDrive\Documents\GitHub\CS380-Project\out\production\CS380-Project" />
+      <recent name="C:\Users\isaka\OneDrive\Documents\GitHub\CS380-Project" />
+    </key>
+    <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
+      <recent name="" />
+    </key>
+  </component>
+  <component name="RunManager">
+    <configuration name="VINDecoderMain" type="Application" factoryName="Application">
+      <option name="ALTERNATIVE_JRE_PATH" value="openjdk-24" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
+      <option name="MAIN_CLASS_NAME" value="VINDecoderMain" />
+      <module name="vindecoder" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+  </component>
+  <component name="TaskManager">
+    <servers />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/cs380project/VINDecoderMain.java</url>
+          <line>31</line>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
+</project>
