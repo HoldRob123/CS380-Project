@@ -12,12 +12,13 @@
 import javax.swing.*;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Map;
 
 
 public class VINDecoderMain {
 
     // Database credentials
-    private static final String DB_URL = "jdbc:mysql://10.10.10.64:3306/vin_decoder_db?useSSL=false&serverTimezone=UTC";;
+    private static final String DB_URL = "jdbc:mysql://10.10.15.3:3306/vin_decoder_db?useSSL=false&serverTimezone=UTC";;
     private static final String DB_USERNAME = "GEN_USE";
     private static final String DB_PASSWORD = "pass1";
 
@@ -106,23 +107,21 @@ public class VINDecoderMain {
 
     // TODO (+HOLDEN) (+SAUL): WRITE LOGIC TO SEARCH NHTSA AND MYSQL WITH THE GIVEN IDENTIFIER AND RETURN A LIST OF TEMP VEHICLE OBJECTS
     public ArrayList<Vehicle> confirmSearch(String identifier) {
+         if (identifier.length() == 17) {
+
+         }
         return null;
     }
 
 
-    // TODO (+HOLDEN): MAKE GUI AND WRITE LOGIC TO TRANSPOSE THE FILTERS THE USER APPLIED IN GUI TO AN ARRAY LIST OF ATTRIBUTES
-    public ArrayList<String> applyFilter() {
-            ArrayList<String> filterList = new ArrayList<String>();
-            return filterList;
-    }
+
 
     // TODO (+HOLDEN) (+SAUL): WRITE LOGIC TO SEARCH FOR THE VEHICLE IN MYSQL AND NHTSA GIVEN AN ARRAY LIST OF ATTRIBUTES
-    public ArrayList<Vehicle> confirmFilter(ArrayList<String> filterList) {
+    public ArrayList<Vehicle> confirmFilter(Map<String, String> filterList) {
 
-//        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD)) {
-//            Integer userId = null;
-//
-//            if (isSavedOnly) {
+
+
+//            if (filterList.containsKey(savedOnly)) {
 //                // Get userId from username
 //                String userIdQuery = "SELECT userID FROM users WHERE userName = ?";
 //                try (PreparedStatement userStmt = conn.prepareStatement(userIdQuery)) {

@@ -1,12 +1,21 @@
-
 import javax.swing.*;
+import java.awt.*;
+import java.util.HashMap;
+import java.util.Map;
 
 class MainView extends JFrame {
     private JTextField searchField;
     private JButton confirmButton, filterButton;
     private JPanel filterPanel, resultPanel;
 
-    public MainView() {
+    private JComboBox<String> yearBox, makeBox, modelBox, countryBox;
+    private JCheckBox gas, diesel, ev, savedOnly;
+
+    private VINDecoderMain mainSystem;
+
+    public MainView(VINDecoderMain mainSystem) {
+        this.mainSystem = mainSystem;
+
         setTitle("vBreed Main Screen");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setSize(700, 500);
@@ -35,11 +44,12 @@ class MainView extends JFrame {
         filterPanel.setBorder(BorderFactory.createTitledBorder("Filter Menu"));
         filterPanel.setVisible(false);
 
+        // Filter components setup
         JLabel yearLabel = new JLabel("Year:");
         yearLabel.setBounds(10, 20, 100, 20);
         filterPanel.add(yearLabel);
 
-        JComboBox<String> yearBox = new JComboBox<>(new String[]{"", "2020", "2021", "2022"});
+        yearBox = new JComboBox<>(new String[]{"", "2020", "2021", "2022"});
         yearBox.setBounds(70, 20, 100, 20);
         filterPanel.add(yearBox);
 
@@ -47,7 +57,7 @@ class MainView extends JFrame {
         makeLabel.setBounds(10, 50, 100, 20);
         filterPanel.add(makeLabel);
 
-        JComboBox<String> makeBox = new JComboBox<>(new String[]{"", "Honda", "Toyota"});
+        makeBox = new JComboBox<>(new String[]{"", "Honda", "Toyota"});
         makeBox.setBounds(70, 50, 100, 20);
         filterPanel.add(makeBox);
 
@@ -55,7 +65,7 @@ class MainView extends JFrame {
         modelLabel.setBounds(10, 80, 100, 20);
         filterPanel.add(modelLabel);
 
-        JComboBox<String> modelBox = new JComboBox<>(new String[]{"", "Civic", "Accord"});
+        modelBox = new JComboBox<>(new String[]{"", "Civic", "Accord"});
         modelBox.setBounds(70, 80, 100, 20);
         filterPanel.add(modelBox);
 
@@ -63,7 +73,7 @@ class MainView extends JFrame {
         countryLabel.setBounds(10, 110, 100, 20);
         filterPanel.add(countryLabel);
 
-        JComboBox<String> countryBox = new JComboBox<>(new String[]{"", "USA", "Japan"});
+        countryBox = new JComboBox<>(new String[]{"", "USA", "Japan"});
         countryBox.setBounds(70, 110, 100, 20);
         filterPanel.add(countryBox);
 
@@ -71,19 +81,19 @@ class MainView extends JFrame {
         fuelLabel.setBounds(10, 140, 100, 20);
         filterPanel.add(fuelLabel);
 
-        JCheckBox gas = new JCheckBox("Gas");
+        gas = new JCheckBox("Gas");
         gas.setBounds(70, 140, 50, 20);
         filterPanel.add(gas);
 
-        JCheckBox diesel = new JCheckBox("Diesel");
+        diesel = new JCheckBox("Diesel");
         diesel.setBounds(70, 160, 70, 20);
         filterPanel.add(diesel);
 
-        JCheckBox ev = new JCheckBox("EV");
+        ev = new JCheckBox("EV");
         ev.setBounds(70, 180, 50, 20);
         filterPanel.add(ev);
 
-        JCheckBox savedOnly = new JCheckBox("Saved only");
+        savedOnly = new JCheckBox("Saved only");
         savedOnly.setBounds(10, 200, 120, 20);
         filterPanel.add(savedOnly);
 
@@ -95,10 +105,44 @@ class MainView extends JFrame {
         scrollPane.setBounds(20, 300, 650, 150);
         add(scrollPane);
 
+        // Event listeners
         filterButton.addActionListener(e -> filterPanel.setVisible(!filterPanel.isVisible()));
+
+        confirmButton.addActionListener(e -> {
+            String query = searchField.getText();
+            if(query.isEmpty()) {
+                Map<String, String> filters = getFilters();
+                mainSystem.confirmFilter(filters);
+            } else {
+                mainSystem.confirmSearch(query);
+            }
+        });
     }
 
-    private void displaySearchResults(String query) {
+    // Method to expose filters
+    private Map<String, String> getFilters() {
+        Map<String, String> filters = new HashMap<>();
+
+        filters.put("year", (String) yearBox.getSelectedItem());
+        filters.put("make", (String) makeBox.getSelectedItem());
+        filters.put("model", (String) modelBox.getSelectedItem());
+        filters.put("country", (String) countryBox.getSelectedItem());
+
+        // Combine fuel types
+        StringBuilder fuelTypes = new StringBuilder();
+        if (gas.isSelected()) fuelTypes.append("Gas,");
+        if (diesel.isSelected()) fuelTypes.append("Diesel,");
+        if (ev.isSelected()) fuelTypes.append("EV,");
+        if (fuelTypes.length() > 0) {
+            fuelTypes.setLength(fuelTypes.length() - 1); // remove last comma
+        }
+        filters.put("fuel", fuelTypes.toString());
+
+        filters.put("savedOnly", String.valueOf(savedOnly.isSelected()));
+        return filters;
+    }
+
+    public void displaySearchResults(String query) {
         resultPanel.removeAll();
         if (query != null && !query.trim().isEmpty()) {
             for (int i = 1; i <= 3; i++) {
