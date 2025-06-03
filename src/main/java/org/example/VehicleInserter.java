@@ -35,7 +35,7 @@ public class VehicleInserter {
             );
 
             // Display preview
-            System.out.println("\nVehicle Preview:");
+            System.out.println("\nGUIFiles.Vehicle Preview:");
             System.out.println("Year: " + tempVehicle.getYear());
             System.out.println("Make: " + tempVehicle.getMake());
             System.out.println("Model: " + tempVehicle.getModel());
@@ -46,7 +46,7 @@ public class VehicleInserter {
             String choice = scanner.nextLine().trim().toLowerCase();
 
             if (!choice.equals("yes")) {
-                System.out.println(" Vehicle not saved.");
+                System.out.println(" GUIFiles.Vehicle not saved.");
                 return;
             }
 
@@ -101,7 +101,7 @@ public class VehicleInserter {
                     pstmt.setString(21, userId);
 
                     pstmt.executeUpdate();
-                    System.out.println("Vehicle successfully saved to the database.");
+                    System.out.println("GUIFiles.Vehicle successfully saved to the database.");
                 }
 
             }

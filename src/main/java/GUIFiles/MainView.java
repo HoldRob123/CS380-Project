@@ -2,7 +2,6 @@ package GUIFiles;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -12,7 +11,7 @@ public class MainView extends JFrame {
     private JPanel filterPanel;
     private JPanel resultPanel;
     private JScrollPane scrollPane;
-    private List<Vehicle> vehicleDatabase;
+    private List<GUIFiles.Vehicle> vehicleDatabase;
     private JComboBox<String> yearBox, makeBox, modelBox;
     private JCheckBox gasBox, dieselBox, evBox;
 
@@ -50,9 +49,255 @@ public class MainView extends JFrame {
 
         // Fake data
         vehicleDatabase = new ArrayList<>();
-        vehicleDatabase.add(new Vehicle("VIN: 934892HAD84R319573", "Honda", "Accord", "2002", ""));
-        vehicleDatabase.add(new Vehicle("VIN: 548622G0BU6381355", "Honda", "Civic", "1997", "Lucy"));
-        vehicleDatabase.add(new Vehicle("VIN: 9101TGG873HS22884", "Toyota", "Corolla", "2005", ""));
+        vehicleDatabase.add(new GUIFiles.Vehicle(
+                "934892HAD84R319573",
+                "Project Car",
+                "Honda",
+                "Accord",
+                2002,
+                true,
+                "EX",
+                "Sedan",
+                "Coupe",
+                4,
+                "Gasoline",
+                "FWD",
+                "K24A4",
+                4,
+                2.4,
+                "Automatic",
+                5,
+                "Japan",
+                "Honda Motor Co",
+                "3501-4000 lbs",
+                2,
+                5
+        ));
+
+        vehicleDatabase.add(new GUIFiles.Vehicle(
+                "548622G0BU6381355",
+                "Lucy",
+                "Honda",
+                "Civic",
+                1997,
+                true,
+                "DX",
+                "Sedan",
+                "Sedan",
+                4,
+                "Gasoline",
+                "FWD",
+                "D16Y7",
+                4,
+                1.6,
+                "Manual",
+                5,
+                "USA",
+                "Honda Mfg",
+                "3001-3500 lbs",
+                2,
+                5
+        ));
+
+        vehicleDatabase.add(new GUIFiles.Vehicle(
+                "9101TGG873HS22884",
+                "", // No nickname
+                "Toyota",
+                "Corolla",
+                2005,
+                false,
+                "LE",
+                "Sedan",
+                "Sedan",
+                4,
+                "Gasoline",
+                "FWD",
+                "1ZZ-FE",
+                4,
+                1.8,
+                "Automatic",
+                4,
+                "USA",
+                "Toyota Motor Corp",
+                "3001-3500 lbs",
+                2,
+                5
+        ));
+
+        vehicleDatabase.add(new GUIFiles.Vehicle(
+                "9101TGG873HS22884",
+                "", // No nickname
+                "Toyota",
+                "Corolla",
+                2005,
+                false,
+                "LE",
+                "Sedan",
+                "Sedan",
+                4,
+                "Gasoline",
+                "FWD",
+                "1ZZ-FE",
+                4,
+                1.8,
+                "Automatic",
+                4,
+                "USA",
+                "Toyota Motor Corp",
+                "3001-3500 lbs",
+                2,
+                5
+        ));
+
+        vehicleDatabase.add(new GUIFiles.Vehicle(
+                "9101TGG873HS22884",
+                "", // No nickname
+                "Toyota",
+                "Corolla",
+                2005,
+                false,
+                "LE",
+                "Sedan",
+                "Sedan",
+                4,
+                "Gasoline",
+                "FWD",
+                "1ZZ-FE",
+                4,
+                1.8,
+                "Automatic",
+                4,
+                "USA",
+                "Toyota Motor Corp",
+                "3001-3500 lbs",
+                2,
+                5
+        ));
+
+        vehicleDatabase.add(new GUIFiles.Vehicle(
+                "9101TGG873HS22884",
+                "", // No nickname
+                "Toyota",
+                "Corolla",
+                2005,
+                false,
+                "LE",
+                "Sedan",
+                "Sedan",
+                4,
+                "Gasoline",
+                "FWD",
+                "1ZZ-FE",
+                4,
+                1.8,
+                "Automatic",
+                4,
+                "USA",
+                "Toyota Motor Corp",
+                "3001-3500 lbs",
+                2,
+                5
+        ));
+
+        vehicleDatabase.add(new GUIFiles.Vehicle(
+                "9101TGG873HS22884",
+                "", // No nickname
+                "Toyota",
+                "Corolla",
+                2005,
+                false,
+                "LE",
+                "Sedan",
+                "Sedan",
+                4,
+                "Gasoline",
+                "FWD",
+                "1ZZ-FE",
+                4,
+                1.8,
+                "Automatic",
+                4,
+                "USA",
+                "Toyota Motor Corp",
+                "3001-3500 lbs",
+                2,
+                5
+        ));
+
+        vehicleDatabase.add(new GUIFiles.Vehicle(
+                "9101TGG873HS22884",
+                "", // No nickname
+                "Toyota",
+                "Corolla",
+                2005,
+                false,
+                "LE",
+                "Sedan",
+                "Sedan",
+                4,
+                "Gasoline",
+                "FWD",
+                "1ZZ-FE",
+                4,
+                1.8,
+                "Automatic",
+                4,
+                "USA",
+                "Toyota Motor Corp",
+                "3001-3500 lbs",
+                2,
+                5
+        ));
+
+        vehicleDatabase.add(new GUIFiles.Vehicle(
+                "9101TGG873HS22884",
+                "", // No nickname
+                "Toyota",
+                "Corolla",
+                2005,
+                false,
+                "LE",
+                "Sedan",
+                "Sedan",
+                4,
+                "Gasoline",
+                "FWD",
+                "1ZZ-FE",
+                4,
+                1.8,
+                "Automatic",
+                4,
+                "USA",
+                "Toyota Motor Corp",
+                "3001-3500 lbs",
+                2,
+                5
+        ));
+
+        vehicleDatabase.add(new GUIFiles.Vehicle(
+                "9101TGG873HS22884",
+                "", // No nickname
+                "Toyota",
+                "Corolla",
+                2005,
+                false,
+                "LE",
+                "Sedan",
+                "Sedan",
+                4,
+                "Gasoline",
+                "FWD",
+                "1ZZ-FE",
+                4,
+                1.8,
+                "Automatic",
+                4,
+                "USA",
+                "Toyota Motor Corp",
+                "3001-3500 lbs",
+                2,
+                5
+        ));
 
         confirmButton.addActionListener(e -> performSearch());
 
@@ -63,30 +308,34 @@ public class MainView extends JFrame {
         String query = searchField.getText().toLowerCase();
         resultPanel.removeAll();
 
-        List<Vehicle> results = vehicleDatabase.stream()
-                .filter(v -> v.matchesQuery(query))
+        List<GUIFiles.Vehicle> results = vehicleDatabase.stream()
+                .filter(v -> v.getVIN().toLowerCase().contains(query)
+                        || v.getMake().toLowerCase().contains(query)
+                        || v.getModel().toLowerCase().contains(query)
+                        || String.valueOf(v.getYear()).contains(query)
+                        || (v.getNickname() != null && v.getNickname().toLowerCase().contains(query)))
                 .filter(v -> {
-                    boolean yearMatch = yearBox.getSelectedItem().equals("Any") || v.year.equals(yearBox.getSelectedItem());
-                    boolean makeMatch = makeBox.getSelectedItem().equals("Any") || v.make.equalsIgnoreCase((String) makeBox.getSelectedItem());
-                    boolean modelMatch = modelBox.getSelectedItem().equals("Any") || v.model.equalsIgnoreCase((String) modelBox.getSelectedItem());
+                    boolean yearMatch = yearBox.getSelectedItem().equals("Any") || String.valueOf(v.getYear()).equals(yearBox.getSelectedItem());
+                    boolean makeMatch = makeBox.getSelectedItem().equals("Any") || v.getMake().equalsIgnoreCase((String) makeBox.getSelectedItem());
+                    boolean modelMatch = modelBox.getSelectedItem().equals("Any") || v.getModel().equalsIgnoreCase((String) modelBox.getSelectedItem());
                     return yearMatch && makeMatch && modelMatch;
                 })
                 .collect(Collectors.toList());
 
-        for (Vehicle vehicle : results) {
+        for (GUIFiles.Vehicle vehicle : results) {
             JPanel vehicleCard = new JPanel(new BorderLayout());
             vehicleCard.setBorder(BorderFactory.createLineBorder(Color.GRAY));
             vehicleCard.setMaximumSize(new Dimension(Integer.MAX_VALUE, 100));
 
             JPanel textPanel = new JPanel();
             textPanel.setLayout(new BoxLayout(textPanel, BoxLayout.Y_AXIS));
-            if (!vehicle.nickname.isEmpty()) {
-                textPanel.add(new JLabel("Nickname: " + vehicle.nickname));
+            if (vehicle.getNickname() != null && !vehicle.getNickname().isEmpty()) {
+                textPanel.add(new JLabel("Nickname: " + vehicle.getNickname()));
             }
-            textPanel.add(new JLabel(vehicle.vin));
-            textPanel.add(new JLabel("Make: " + vehicle.make));
-            textPanel.add(new JLabel("Model: " + vehicle.model));
-            textPanel.add(new JLabel("Year: " + vehicle.year));
+            textPanel.add(new JLabel("VIN: " + vehicle.getVIN()));
+            textPanel.add(new JLabel("Make: " + vehicle.getMake()));
+            textPanel.add(new JLabel("Model: " + vehicle.getModel()));
+            textPanel.add(new JLabel("Year: " + vehicle.getYear()));
 
             JButton moreOptions = new JButton("...");
             moreOptions.setPreferredSize(new Dimension(50, 30));
@@ -103,33 +352,54 @@ public class MainView extends JFrame {
 
     private void showVehicleOptions(Vehicle vehicle, Component invoker) {
         JPopupMenu menu = new JPopupMenu();
-        if (!vehicle.nickname.isEmpty()) {
+        if (vehicle.getNickname() != null && !vehicle.getNickname().isEmpty()) {
             JMenuItem editName = new JMenuItem("Edit Name");
-            editName.addActionListener(e -> JOptionPane.showMessageDialog(this, "Edit name clicked for " + vehicle.nickname));
+            editName.addActionListener(e -> {
+                String newName = JOptionPane.showInputDialog(this, "Enter new nickname:", vehicle.getNickname());
+                if (newName != null && !newName.trim().isEmpty()) {
+                    vehicle.setNickname(newName.trim());
+                    JOptionPane.showMessageDialog(this, "Nickname updated to: " + newName);
+                    performSearch();
+                }
+            });
             menu.add(editName);
 
             JMenuItem compare = new JMenuItem("Compare Vehicle");
-            compare.addActionListener(e -> JOptionPane.showMessageDialog(this, "Compare clicked for " + vehicle.nickname));
+            compare.addActionListener(e -> {
+                SwingUtilities.invokeLater(() -> new CompareView(vehicle));
+            });
             menu.add(compare);
 
+
             JMenuItem info = new JMenuItem("Full Information");
-            info.addActionListener(e -> JOptionPane.showMessageDialog(this, vehicle.toString()));
+            info.addActionListener(e -> {
+                JOptionPane.showMessageDialog(this, vehicle.fullDescription(), "Vehicle Info", JOptionPane.INFORMATION_MESSAGE);
+            });
             menu.add(info);
 
             JMenuItem remove = new JMenuItem("Remove from Saved");
-            remove.addActionListener(e -> JOptionPane.showMessageDialog(this, vehicle.nickname + " removed from saved."));
+            remove.addActionListener(e -> {
+                vehicle.setIsSaved(false);
+                JOptionPane.showMessageDialog(this, vehicle.getNickname() + " removed from saved.");
+                performSearch();
+            });
             menu.add(remove);
         } else {
             JMenuItem compare = new JMenuItem("Compare Vehicle");
-            compare.addActionListener(e -> JOptionPane.showMessageDialog(this, "Compare clicked for " + vehicle.vin));
+            compare.addActionListener(e -> {
+                JOptionPane.showMessageDialog(this, "Comparison feature not implemented yet for " + vehicle.getVIN());
+            });
             menu.add(compare);
 
             JMenuItem info = new JMenuItem("Full Information");
-            info.addActionListener(e -> JOptionPane.showMessageDialog(this, vehicle.toString()));
+            info.addActionListener(e -> {
+                JOptionPane.showMessageDialog(this, vehicle.fullDescription(), "Vehicle Info", JOptionPane.INFORMATION_MESSAGE);
+            });
             menu.add(info);
         }
-        menu.show(invoker, invoker.getWidth()/2, invoker.getHeight()/2);
+        menu.show(invoker, invoker.getWidth() / 2, invoker.getHeight() / 2);
     }
+
 
     private void showFilterPopup() {
         JFrame popup = new JFrame("Filter Menu");
@@ -173,35 +443,5 @@ public class MainView extends JFrame {
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(MainView::new);
-    }
-
-    class Vehicle {
-        String vin;
-        String make;
-        String model;
-        String year;
-        String nickname;
-
-        public Vehicle(String vin, String make, String model, String year, String nickname) {
-            this.vin = vin;
-            this.make = make;
-            this.model = model;
-            this.year = year;
-            this.nickname = nickname;
-        }
-
-        public boolean matchesQuery(String query) {
-            return vin.toLowerCase().contains(query) ||
-                    make.toLowerCase().contains(query) ||
-                    model.toLowerCase().contains(query) ||
-                    year.toLowerCase().contains(query) ||
-                    nickname.toLowerCase().contains(query);
-        }
-
-        @Override
-        public String toString() {
-            return (nickname.isEmpty() ? "" : "Nickname: " + nickname + "\n") +
-                    vin + "\nMake: " + make + "\nModel: " + model + "\nYear: " + year;
-        }
     }
 }

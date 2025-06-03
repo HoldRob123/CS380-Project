@@ -80,8 +80,8 @@ public class VehicleSearch {
                             rs.getString("V_make"),
                             rs.getString("V_model"),
                             rs.getString("V_year"),
-                            rs.getString("nickname")
-                    );
+                            2002, true, rs.getString("nickname"),
+                            "Sedan", "Coupe", 4, "Gasoline", "FWD", "K24A4", 4, 2.4, "Automatic", 5, "Japan", "Honda Motor Co", "3501-4000 lbs", 2, 5);
                     vehicleList.add(vehicle);
                 }
             }

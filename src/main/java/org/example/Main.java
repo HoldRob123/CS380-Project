@@ -72,7 +72,7 @@ public class Main {
             pstmt.setInt(19, parseIntSafe(extractDetail(body, "SeatRows")));           // V_rows
             pstmt.setInt(20, parseIntSafe(extractDetail(body, "Seats")));              // V_seats
             pstmt.executeUpdate();
-            System.out.println("org.example.Vehicle inserted into database!");
+            System.out.println("org.example.GUIFiles.Vehicle inserted into database!");
 
             conn.close();
 
