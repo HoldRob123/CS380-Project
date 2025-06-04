@@ -10,9 +10,12 @@
  *****************************************/
 
 import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.Map;
+import java.util.*;
+import java.util.List;
+import java.util.stream.Collectors;
 
 
 public class VINDecoderMain {
@@ -24,6 +27,13 @@ public class VINDecoderMain {
 
     // User Credentials
     public String currentUser = "";
+
+    // Fake Data
+    private List<Vehicle> vehicleDatabase;
+
+    // GUI References
+    private LoginScreen loginScreen;
+    public MainView mainView;
 
     // Facilitator method for main screen
     public void run() {
@@ -98,6 +108,124 @@ public class VINDecoderMain {
         }
     }
 
+    // Fake data for testing; replace with DB or API calls later
+    private void fakeData() {
+        vehicleDatabase = new ArrayList<>();
+        vehicleDatabase.add(new Vehicle("934892HAD84R319573", "Project Car", "Honda", "Accord", 2002, true,
+                "EX", "Sedan", "Coupe", 4, "Gasoline", "FWD", "K24A4", 4, 2.4, "Automatic", 5,
+                "Japan", "Honda Motor Co", "3501-4000 lbs", 2, 5));
+        vehicleDatabase.add(new Vehicle("548622G0BU6381355", "Lucy", "Honda", "Civic", 1997, true,
+                "DX", "Sedan", "Sedan", 4, "Gasoline", "FWD", "D16Y7", 4, 1.6, "Manual", 5,
+                "USA", "Honda Mfg", "3001-3500 lbs", 2, 5));
+        vehicleDatabase.add(new Vehicle("9101TGG873HS22884", "", "Toyota", "Corolla", 2005, false,
+                "LE", "Sedan", "Sedan", 4, "Gasoline", "FWD", "1ZZ-FE", 4, 1.8, "Automatic", 4,
+                "USA", "Toyota Motor Corp", "3001-3500 lbs", 2, 5));
+    }
+
+    // Perform search & filtering and update GUI results panel
+    public void performSearch() {
+        if (mainView ==null) return;
+
+        String query = mainView.getSearchField().getText().toString();
+        JPanel resultPanel = mainView.getResultPanel();
+        resultPanel.removeAll();
+
+        List<Vehicle> results = vehicleDatabase.stream()
+                .filter(v-> query.isEmpty() || v.getVIN().toLowerCase().contains(query)
+                    || v.getMake().toLowerCase().contains(query)
+                    || v.getModel().toLowerCase().contains(query)
+                    || String.valueOf(v.getYear()).contains(query)
+                    || (v.getNickname() != null && v.getNickname().toLowerCase().contains(query)))
+                .filter(this::matchesFilter)
+                .collect(Collectors.toList());
+
+        for (Vehicle v : results) {
+            JPanel card = new JPanel(new BorderLayout());
+            card.setMaximumSize(new Dimension(Integer.MAX_VALUE, 100));
+            card.setBorder(BorderFactory.createLineBorder(Color.gray));
+
+            JPanel info = new JPanel();
+            info.setLayout(new BoxLayout(info, BoxLayout.Y_AXIS));
+            if (v.getNickname() != null && !v.getNickname().isEmpty()) {
+                info.add(new JLabel("Nickname: " + v.getNickname()));
+            }
+            info.add(new JLabel("VIN: " + v.getVIN()));
+            info.add(new JLabel("Make: " + v.getMake()));
+            info.add(new JLabel("Model: " + v.getModel()));
+            info.add(new JLabel("Year: " + v.getYear()));
+
+            JButton options = new JButton("...");
+            options.setPreferredSize(new Dimension(50, 30));
+            options.addActionListener(e -> showVehicleOptions(v, options));
+
+            card.add(info, BorderLayout.CENTER);
+            card.add(options, BorderLayout.EAST);
+            resultPanel.add(card);
+        }
+
+        resultPanel.revalidate();
+        resultPanel.repaint();
+    }
+
+    // Filter logic matching the GUI filter fields
+    private boolean matchesFilter(Vehicle v) {
+        if (mainView == null) return true;
+
+        String year = mainView.getYearBox().getText().trim();
+        String make = mainView.getMakeBox().getText().trim();
+        String model = mainView.getModelBox().getText().trim();
+        String country = mainView.getCountryBox().getText().trim();
+        String fuel = (String) mainView.getGasType().getSelectedItem();
+
+        if (!year.isEmpty() && !String.valueOf(v.getYear()).equals(year)) return false;
+        if (!make.isEmpty() && !v.getMake().equalsIgnoreCase(make)) return false;
+        if (!model.isEmpty() && !v.getModel().equalsIgnoreCase(model)) return false;
+        if (!country.isEmpty() && !v.getPlantCountry().equalsIgnoreCase(country)) return false;
+        if (mainView.getSavedOnly().isSelected() && !v.getSaved()) return false;
+
+        if (fuel != null && !fuel.isEmpty()) {
+            if (v.getFuelTypePrimary() == null || !v.getFuelTypePrimary().equalsIgnoreCase(fuel)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    // Popup menu when clicking vehicle options "..." button
+    private void showVehicleOptions(Vehicle vehicle, Component invoker) {
+        JPopupMenu menu = new JPopupMenu();
+
+        if (vehicle.getNickname() != null && !vehicle.getNickname().isEmpty()) {
+            JMenuItem edit = new JMenuItem("Edit Name");
+            edit.addActionListener(e -> {
+                String newName = JOptionPane.showInputDialog(mainView, "New nickname:", vehicle.getNickname());
+                if (newName != null && !newName.trim().isEmpty()) {
+                    vehicle.setNickname(newName.trim());
+                    JOptionPane.showMessageDialog(mainView, "Nickname updated.");
+                    performSearch();
+                }
+            });
+            menu.add(edit);
+        }
+
+        JMenuItem info = new JMenuItem("Full Information");
+        info.addActionListener(e -> JOptionPane.showMessageDialog(mainView, vehicle.fullDescription(), "Vehicle Info", JOptionPane.INFORMATION_MESSAGE));
+        menu.add(info);
+
+        JMenuItem compare = new JMenuItem("Compare Vehicle");
+        compare.addActionListener(e -> JOptionPane.showMessageDialog(mainView, "Compare not implemented yet."));
+        menu.add(compare);
+
+        JMenuItem remove = new JMenuItem("Remove from Saved");
+        remove.addActionListener(e -> {
+            vehicle.setIsSaved(false);
+            JOptionPane.showMessageDialog(mainView, "Removed from saved.");
+            performSearch();
+        });
+        menu.add(remove);
+
+        menu.show(invoker, invoker.getWidth() / 2, invoker.getHeight() / 2);
+    }
 
 
     // TODO (+HOLDEN): MAKE GUI AND WRITE LOGIC TO RETURN WHAT USER HAS TYPED IN SEARCH
