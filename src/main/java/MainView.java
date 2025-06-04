@@ -62,7 +62,7 @@ public class MainView extends JFrame {
 
     private JPanel createFilterPanel() {
         JPanel panel = new JPanel(null);
-        panel.setBounds(300, 60, 220, 260);
+        panel.setBounds(300, 60, 220, 220);
         panel.setBorder(BorderFactory.createTitledBorder("Filter Menu"));
         panel.setVisible(false);
 
@@ -109,10 +109,6 @@ public class MainView extends JFrame {
         savedOnly = new JCheckBox("Saved only");
         savedOnly.setBounds(10, 170, 150, 20);
         panel.add(savedOnly);
-
-        JButton applyButton = new JButton("Apply");
-        applyButton.setBounds(60, 210, 100, 30);
-        panel.add(applyButton);
 
         return panel;
     }
