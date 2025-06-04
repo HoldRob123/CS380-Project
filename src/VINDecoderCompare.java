@@ -1,6 +1,6 @@
 
 import java.util.ArrayList;
-
+//
 public class VINDecoderCompare extends VINDecoderMain{
 
     // Facilitator method for the compare screen

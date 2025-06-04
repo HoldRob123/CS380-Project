@@ -9,21 +9,42 @@
  Last Modified By: Isak
  *****************************************/
 
+import org.json.JSONObject;
+
 import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.Map;
+import java.util.*;
+import java.util.List;
+import java.util.stream.Collectors;
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+
 
 
 public class VINDecoderMain {
 
     // Database credentials
-    private static final String DB_URL = "jdbc:mysql://10.10.15.3:3306/vin_decoder_db?useSSL=false&serverTimezone=UTC";;
+    private static final String DB_URL = "jdbc:mysql://192.168.0.13:3306/vin_decoder_db?useSSL=false&serverTimezone=UTC";;
     private static final String DB_USERNAME = "GEN_USE";
     private static final String DB_PASSWORD = "pass1";
 
     // User Credentials
     public String currentUser = "";
+    public int currentUserID = -1;
+
+    // Fake Data
+    private List<Vehicle> vehicleDatabase;
+
+    // GUI References
+    private LoginScreen loginScreen;
+    public MainView mainView;
 
     // Facilitator method for main screen
     public void run() {
@@ -33,8 +54,8 @@ public class VINDecoderMain {
             loginScreen.setVisible(true);
         });
     }
+
     // logs in based on the credentials the user has entered
-    // TODO (+SAUL) TEST DATABASE WITH THIS METHOD!
     public String tryLogin(String username, String password) {
         String result;
 
@@ -98,6 +119,124 @@ public class VINDecoderMain {
         }
     }
 
+    // Fake data for testing; replace with DB or API calls later
+    private void fakeData() {
+        vehicleDatabase = new ArrayList<>();
+        vehicleDatabase.add(new Vehicle("934892HAD84R319573", "Project Car", "Honda", "Accord", 2002, true,
+                "EX", "Sedan", "Coupe", 4, "Gasoline", "FWD", "K24A4", 4, 2.4, "Automatic", 5,
+                "Japan", "Honda Motor Co", "3501-4000 lbs", 2, 5));
+        vehicleDatabase.add(new Vehicle("548622G0BU6381355", "Lucy", "Honda", "Civic", 1997, true,
+                "DX", "Sedan", "Sedan", 4, "Gasoline", "FWD", "D16Y7", 4, 1.6, "Manual", 5,
+                "USA", "Honda Mfg", "3001-3500 lbs", 2, 5));
+        vehicleDatabase.add(new Vehicle("9101TGG873HS22884", "", "Toyota", "Corolla", 2005, false,
+                "LE", "Sedan", "Sedan", 4, "Gasoline", "FWD", "1ZZ-FE", 4, 1.8, "Automatic", 4,
+                "USA", "Toyota Motor Corp", "3001-3500 lbs", 2, 5));
+    }
+
+    // Perform search & filtering and update GUI results panel
+    public void performSearch() {
+        if (mainView ==null) return;
+
+        String query = mainView.getSearchField().getText().toString();
+        JPanel resultPanel = mainView.getResultPanel();
+        resultPanel.removeAll();
+
+        List<Vehicle> results = vehicleDatabase.stream()
+                .filter(v-> query.isEmpty() || v.getVIN().toLowerCase().contains(query)
+                        || v.getMake().toLowerCase().contains(query)
+                        || v.getModel().toLowerCase().contains(query)
+                        || String.valueOf(v.getYear()).contains(query)
+                        || (v.getNickname() != null && v.getNickname().toLowerCase().contains(query)))
+                .filter(this::matchesFilter)
+                .collect(Collectors.toList());
+
+        for (Vehicle v : results) {
+            JPanel card = new JPanel(new BorderLayout());
+            card.setMaximumSize(new Dimension(Integer.MAX_VALUE, 100));
+            card.setBorder(BorderFactory.createLineBorder(Color.gray));
+
+            JPanel info = new JPanel();
+            info.setLayout(new BoxLayout(info, BoxLayout.Y_AXIS));
+            if (v.getNickname() != null && !v.getNickname().isEmpty()) {
+                info.add(new JLabel("Nickname: " + v.getNickname()));
+            }
+            info.add(new JLabel("VIN: " + v.getVIN()));
+            info.add(new JLabel("Make: " + v.getMake()));
+            info.add(new JLabel("Model: " + v.getModel()));
+            info.add(new JLabel("Year: " + v.getYear()));
+
+            JButton options = new JButton("...");
+            options.setPreferredSize(new Dimension(50, 30));
+            options.addActionListener(e -> showVehicleOptions(v, options));
+
+            card.add(info, BorderLayout.CENTER);
+            card.add(options, BorderLayout.EAST);
+            resultPanel.add(card);
+        }
+
+        resultPanel.revalidate();
+        resultPanel.repaint();
+    }
+
+    // Filter logic matching the GUI filter fields
+    private boolean matchesFilter(Vehicle v) {
+        if (mainView == null) return true;
+
+        String year = mainView.getYearBox().getText().trim();
+        String make = mainView.getMakeBox().getText().trim();
+        String model = mainView.getModelBox().getText().trim();
+        String country = mainView.getCountryBox().getText().trim();
+        String fuel = (String) mainView.getGasType().getSelectedItem();
+
+        if (!year.isEmpty() && !String.valueOf(v.getYear()).equals(year)) return false;
+        if (!make.isEmpty() && !v.getMake().equalsIgnoreCase(make)) return false;
+        if (!model.isEmpty() && !v.getModel().equalsIgnoreCase(model)) return false;
+        if (!country.isEmpty() && !v.getPlantCountry().equalsIgnoreCase(country)) return false;
+        if (mainView.getSavedOnly().isSelected() && !v.getSaved()) return false;
+
+        if (fuel != null && !fuel.isEmpty()) {
+            if (v.getFuelTypePrimary() == null || !v.getFuelTypePrimary().equalsIgnoreCase(fuel)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    // Popup menu when clicking vehicle options "..." button
+    private void showVehicleOptions(Vehicle vehicle, Component invoker) {
+        JPopupMenu menu = new JPopupMenu();
+
+        if (vehicle.getNickname() != null && !vehicle.getNickname().isEmpty()) {
+            JMenuItem edit = new JMenuItem("Edit Name");
+            edit.addActionListener(e -> {
+                String newName = JOptionPane.showInputDialog(mainView, "New nickname:", vehicle.getNickname());
+                if (newName != null && !newName.trim().isEmpty()) {
+                    vehicle.setNickname(newName.trim());
+                    JOptionPane.showMessageDialog(mainView, "Nickname updated.");
+                    performSearch();
+                }
+            });
+            menu.add(edit);
+        }
+
+        JMenuItem info = new JMenuItem("Full Information");
+        info.addActionListener(e -> JOptionPane.showMessageDialog(mainView, vehicle.fullDescription(), "Vehicle Info", JOptionPane.INFORMATION_MESSAGE));
+        menu.add(info);
+
+        JMenuItem compare = new JMenuItem("Compare Vehicle");
+        compare.addActionListener(e -> JOptionPane.showMessageDialog(mainView, "Compare not implemented yet."));
+        menu.add(compare);
+
+        JMenuItem remove = new JMenuItem("Remove from Saved");
+        remove.addActionListener(e -> {
+            vehicle.setIsSaved(false);
+            JOptionPane.showMessageDialog(mainView, "Removed from saved.");
+            performSearch();
+        });
+        menu.add(remove);
+
+        menu.show(invoker, invoker.getWidth() / 2, invoker.getHeight() / 2);
+    }
 
 
     // TODO (+HOLDEN): MAKE GUI AND WRITE LOGIC TO RETURN WHAT USER HAS TYPED IN SEARCH
@@ -107,93 +246,162 @@ public class VINDecoderMain {
 
     // TODO (+HOLDEN) (+SAUL): WRITE LOGIC TO SEARCH NHTSA AND MYSQL WITH THE GIVEN IDENTIFIER AND RETURN A LIST OF TEMP VEHICLE OBJECTS
     public ArrayList<Vehicle> confirmSearch(String identifier) {
-         if (identifier.length() == 17) {
+        if (identifier.length() == 17) {
 
-         }
+        }
         return null;
     }
 
 
-
-
-    // TODO (+HOLDEN) (+SAUL): WRITE LOGIC TO SEARCH FOR THE VEHICLE IN MYSQL AND NHTSA GIVEN AN ARRAY LIST OF ATTRIBUTES
     public ArrayList<Vehicle> confirmFilter(Map<String, String> filterList) {
+        // Only look at saved vehicles by user
+        if (filterList.containsKey("savedOnly")) {
+            return getSavedFilteredVehicles(filterList);
+        } else {
+            // Look at saved vehicles by user and unsaved vehicles
+            ArrayList<Vehicle> results = getSavedFilteredVehicles(filterList);
+            results.addAll(getFilteredNHTSAVehicles(filterList));
+            return results;
+        }
+    }
 
+    // Helper Method that grabs vehicles in mySQL that match the filters applied by the user
+    private ArrayList<Vehicle> getSavedFilteredVehicles(Map<String, String> filterList) {
+        ArrayList<Vehicle> results = new ArrayList<>();
+        StringBuilder sql = new StringBuilder("SELECT v.* FROM vehicles v");
+        List<Object> params = new ArrayList<>();
 
+        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD)) {
 
-//            if (filterList.containsKey(savedOnly)) {
-//                // Get userId from username
-//                String userIdQuery = "SELECT userID FROM users WHERE userName = ?";
-//                try (PreparedStatement userStmt = conn.prepareStatement(userIdQuery)) {
-//                    userStmt.setString(1, username);
-//                    ResultSet userRs = userStmt.executeQuery();
-//                    if (userRs.next()) {
-//                        userId = userRs.getInt("userID");
-//                    } else {
-//                        System.out.println(" No user found with that username.");
-//                        return vehicleList; // empty list
-//                    }
-//                }
-//            }
-//
-//            StringBuilder sql = new StringBuilder("SELECT v.* FROM vehicles v");
-//            List<Object> params = new ArrayList<>();
-//
-//            if (isSavedOnly) {
-//                sql.append(" JOIN saved_vehicles sv ON v.VIN_NUMBER = sv.vin_number");
-//                sql.append(" JOIN users u ON sv.user_id = u.userID");
-//                sql.append(" WHERE u.userID = ?");
-//                params.add(userId);
-//            } else {
-//                sql.append(" WHERE 1=1");
-//            }
-//
-//            if (vin != null) {
-//                sql.append(" AND v.VIN_NUMBER = ?");
-//                params.add(vin);
-//            }
-//            if (make != null) {
-//                sql.append(" AND v.V_make LIKE ?");
-//                params.add("%" + make + "%");
-//            }
-//            if (model != null) {
-//                sql.append(" AND v.V_model LIKE ?");
-//                params.add("%" + model + "%");
-//            }
-//            if (year != null) {
-//                sql.append(" AND v.V_year = ?");
-//                params.add(year);
-//            }
-//            if (nickname != null) {
-//                sql.append(" AND v.nickname LIKE ?");
-//                params.add("%" + nickname + "%");
-//            }
-//
-//            try (PreparedStatement pstmt = conn.prepareStatement(sql.toString())) {
-//                for (int i = 0; i < params.size(); i++) {
-//                    pstmt.setObject(i + 1, params.get(i));
-//                }
-//
-//                ResultSet rs = pstmt.executeQuery();
-//
-//                while (rs.next()) {
-//                    Vehicle vehicle = new Vehicle(
-//                            rs.getString("VIN_NUMBER"),
-//                            rs.getString("V_make"),
-//                            rs.getString("V_model"),
-//                            rs.getString("V_year"),
-//                            rs.getString("nickname")
-//                    );
-//                    vehicleList.add(vehicle);
-//                }
-//            }
-//
-//        } catch (SQLException e) {
-//            e.printStackTrace();
-//        }
-//
-//        return vehicleList;
-        return null;
+            // If "savedOnly" is in the filter list, get the current user's ID
+            if (filterList.containsKey("savedOnly")) {
+                String userIdQuery = "SELECT userID FROM users WHERE userName = ?";
+                try (PreparedStatement userStmt = conn.prepareStatement(userIdQuery)) {
+                    userStmt.setString(1, currentUser);
+                    ResultSet userRs = userStmt.executeQuery();
+                    if (userRs.next()) {
+                        currentUserID = userRs.getInt("userID");
+                    } else {
+                        System.out.println("No user found with that username.");
+                        return results; // Return empty list
+                    }
+                }
+
+                sql.append(" JOIN saved_vehicles sv ON v.VIN_NUMBER = sv.vin_number");
+                sql.append(" JOIN users u ON sv.user_id = u.userID");
+                sql.append(" WHERE u.userID = ?");
+                params.add(currentUserID);
+            } else {
+                sql.append(" WHERE 1=1");
+            }
+
+            // Add filters if present
+            if (filterList.containsKey("make")) {
+                sql.append(" AND v.V_make LIKE ?");
+                params.add("%" + filterList.get("make") + "%");
+            }
+
+            if (filterList.containsKey("model")) {
+                sql.append(" AND v.V_model LIKE ?");
+                params.add("%" + filterList.get("model") + "%");
+            }
+
+            if (filterList.containsKey("year")) {
+                sql.append(" AND v.V_year = ?");
+                params.add(filterList.get("year"));
+            }
+
+            // Executes SQL command based on filters applied
+            try (PreparedStatement pstmt = conn.prepareStatement(sql.toString())) {
+                for (int i = 0; i < params.size(); i++) {
+                    pstmt.setObject(i + 1, params.get(i));
+                }
+
+                ResultSet rs = pstmt.executeQuery();
+
+                // Adds Vehicles found in mySQL to result listing
+                while (rs.next()) {
+                    Vehicle vehicle = new Vehicle(
+                            rs.getString("VIN_NUMBER"),
+                            rs.getString("Nickname"),
+                            rs.getString("V_make"),
+                            rs.getString("V_model"),
+                            rs.getInt("V_year")
+                    );
+                    results.add(vehicle);
+                }
+            }
+
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(mainView,"Could not establish connection with NHTSA API!", "NHTSA Error!", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+        }
+
+        return results;
+    }
+
+    // Helper method that grabs vehicles that match the filters the user applied
+    //TODO: Figure out a workaround to not getting vehicle VINs from this method of search
+    private ArrayList<Vehicle> getFilteredNHTSAVehicles(Map<String, String> filterList) {
+        ArrayList<Vehicle> results = new ArrayList<>();
+
+        try {
+            // Step 1: Extract filters
+            String make = filterList.getOrDefault("make", "");
+            String model = filterList.getOrDefault("model", "");
+            String sYear = filterList.getOrDefault("year", "");
+
+            // Step 2: Build URL
+            StringBuilder apiUrl = new StringBuilder("https://vpic.nhtsa.dot.gov/api/vehicles/GetModelsForMakeYear/make/");
+            apiUrl.append(make);
+            if (!sYear.isEmpty()) {
+                apiUrl.append("/modelyear/").append(sYear);
+            }
+            apiUrl.append("?format=json");
+
+            // Step 3: Send HTTP GET request
+            URL url = new URL(apiUrl.toString());
+            HttpURLConnection con = (HttpURLConnection) url.openConnection();
+            con.setRequestMethod("GET");
+
+            // Step 4: Read the response
+            BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+            String inputLine;
+            StringBuilder content = new StringBuilder();
+            while ((inputLine = in.readLine()) != null) {
+                content.append(inputLine);
+            }
+
+            // Close connections
+            in.close();
+            con.disconnect();
+
+            // Parse JSON response
+            JSONObject json = new JSONObject(content.toString());
+            JSONArray resultsArray = json.getJSONArray("Results");
+
+            // Turn year from string to int
+            int year = Integer.parseInt(sYear);
+
+            for (int i = 0; i < resultsArray.length(); i++) {
+                JSONObject obj = resultsArray.getJSONObject(i);
+                String nhtsaMake = obj.getString("Make_Name");
+                String nhtsaModel = obj.getString("Model_Name");
+
+                // Optional: match user-specified model if it's not empty
+                if (!model.isEmpty() && !nhtsaModel.toLowerCase().contains(model.toLowerCase())) {
+                    continue;
+                }
+
+                Vehicle vehicle = new Vehicle("<VIN UNKNOWN>", "N/A", nhtsaMake, nhtsaModel, year);
+                results.add(vehicle);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return results;
     }
 
 
