@@ -81,7 +81,6 @@ public class LoginScreen extends JFrame {
     }
 
     private void goToMainScreen() {
-        new MainView(mainSystem).setVisible(true);
-        dispose();
+        mainSystem.onLoginSuccess();
     }
 }

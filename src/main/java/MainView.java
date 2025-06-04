@@ -107,8 +107,12 @@ public class MainView extends JFrame {
         panel.add(gasType);
 
         savedOnly = new JCheckBox("Saved only");
-        savedOnly.setBounds(10, 210, 150, 20);
+        savedOnly.setBounds(10, 170, 150, 20);
         panel.add(savedOnly);
+
+        JButton applyButton = new JButton("Apply");
+        applyButton.setBounds(60, 210, 100, 30);
+        panel.add(applyButton);
 
         return panel;
     }
