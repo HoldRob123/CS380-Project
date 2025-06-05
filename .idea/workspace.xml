@@ -6,13 +6,16 @@
   <component name="ChangeListManager">
     <list default="true" id="88dd8be3-de38-498f-b64f-c57ba0bfd690" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/GUIFiles/CompareView.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/CompareView.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/GUIFiles/LoginScreen.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/LoginScreen.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/GUIFiles/MainView.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/MainView.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/VINDecoderCompare.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/VINDecoderCompare.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Vehicle.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Vehicle.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/CompareView.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/CompareView.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/LoginScreen.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/LoginScreen.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/MainView.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/MainView.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/VINDecoderCompare.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/VINDecoderCompare.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/VINDecoderMain.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/VINDecoderMain.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/Vehicle.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Vehicle.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/CompareView$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/CompareView$1.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/CompareView.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/CompareView.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/MainView.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/MainView.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/VINDecoderCompare.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/VINDecoderCompare.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/VINDecoderMain$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/VINDecoderMain$1.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/VINDecoderMain.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/VINDecoderMain.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/Vehicle.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/Vehicle.class" afterDir="false" />
@@ -21,6 +24,13 @@
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+      </list>
+    </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -48,6 +58,7 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "Application.Sandbox.executor": "Run",
     "Application.VINDecoderMain.executor": "Run",
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
@@ -64,7 +75,9 @@
 }]]></component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\isaka\OneDrive\Documents\GitHub\cs380project\src\main\java\textfiles" />
       <recent name="C:\Users\isaka\OneDrive\Documents\GitHub\cs380project\src\main\java" />
+      <recent name="C:\Users\isaka\OneDrive\Documents\GitHub\cs380project\textfiles" />
     </key>
   </component>
   <component name="SharedIndexes">
@@ -84,11 +97,22 @@
       <option name="presentableId" value="Default" />
       <updated>1748981404458</updated>
       <workItem from="1749083157565" duration="39000" />
-      <workItem from="1749083257541" duration="2771000" />
+      <workItem from="1749083257541" duration="19248000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
 </project>

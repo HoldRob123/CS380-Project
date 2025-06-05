@@ -28,12 +28,13 @@ public class Vehicle {
     private int seats;
 
     // Temporary GUIFiles.Vehicle Constructor: Essential Fields Only
-    public Vehicle(String VIN, String nickname, String make, String model, int year) {
+    public Vehicle(String VIN, String nickname, String make, String model, int year, boolean isSaved) {
         this.VIN = VIN;
         this.nickname = nickname;
         this.make = make;
         this.model = model;
         this.year = year;
+        this.isSaved = isSaved;
 
     }
 
@@ -77,6 +78,7 @@ public class Vehicle {
     }
     public void setIsSaved(boolean b) {
     }
+
 
     // Getters
     public String getNickname() {

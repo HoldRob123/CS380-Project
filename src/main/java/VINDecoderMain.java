@@ -5,7 +5,7 @@
  Holden Robinson
 
  Push Date: 6/4/25
- Push Number: 9
+ Push Number: 11
  Last Modified By: Isak
  *****************************************/
 
@@ -17,6 +17,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -35,7 +36,7 @@ import java.util.stream.Collectors;
 public class VINDecoderMain {
 
     // Database credentials
-    private static final String DB_URL = "jdbc:mysql://localhost:3306/vin_decoder_db?useSSL=false&serverTimezone=UTC";;
+    private static final String DB_URL = "jdbc:mysql://localhost:3306/vin_vehicle_db?allowPublicKeyRetrieval=true&useSSL=false";
     private static final String DB_USERNAME = "GEN_USE";
     private static final String DB_PASSWORD = "pass1";
 
@@ -43,8 +44,10 @@ public class VINDecoderMain {
     public String currentUser = "";
     public int currentUserID = -1;
 
-    // Fake Data
-    private List<Vehicle> vehicleDatabase;
+    // Vehicle Cache
+    protected List<Vehicle> cacheVehicles = new ArrayList<>();
+    Random yr = new Random();
+
 
     // GUI References
     private LoginScreen loginScreen;
@@ -53,12 +56,18 @@ public class VINDecoderMain {
 
     // Facilitator method for main screen
     public void run() {
+        // Loads Vehicle Cache
+        loadCachedVehicles("C:\\Users\\isaka\\OneDrive\\Documents\\GitHub\\cs380project\\src\\main\\java\\textfiles\\vinresults.txt");
         // Launches Login Page
         SwingUtilities.invokeLater(() -> {
             LoginScreen loginScreen = new LoginScreen(this);
             loginScreen.setVisible(true);
         });
     }
+
+
+
+
     // logs in based on the credentials the user has entered
     // TODO (+SAUL) TEST DATABASE WITH THIS METHOD!
     public String tryLogin(String username, String password) {
@@ -96,6 +105,8 @@ public class VINDecoderMain {
         return result;
     }
 
+
+
     // Helper method to tryLogin that will insert a new user entry in mySQL
     private static void createUser(String username, String password) {
         String checkSql = "SELECT COUNT(*) FROM users WHERE userName = ?";
@@ -122,6 +133,8 @@ public class VINDecoderMain {
         }
     }
 
+
+
     public void onLoginSuccess() {
         if (loginScreen != null) {
             loginScreen.dispose();
@@ -132,19 +145,57 @@ public class VINDecoderMain {
         performSearch();
     }
 
-    // Fake data for testing; replace with DB or API calls later
-//    private void fakeData() {
-//        vehicleDatabase = new ArrayList<>();
-//        vehicleDatabase.add(new Vehicle("934892HAD84R319573", "Project Car", "Honda", "Accord", 2002, true,
-//                "EX", "Sedan", "Coupe", 4, "Gasoline", "FWD", "K24A4", 4, 2.4, "Automatic", 5,
-//                "Japan", "Honda Motor Co", "3501-4000 lbs", 2, 5));
-//        vehicleDatabase.add(new Vehicle("548622G0BU6381355", "Lucy", "Honda", "Civic", 1997, true,
-//                "DX", "Sedan", "Sedan", 4, "Gasoline", "FWD", "D16Y7", 4, 1.6, "Manual", 5,
-//                "USA", "Honda Mfg", "3001-3500 lbs", 2, 5));
-//        vehicleDatabase.add(new Vehicle("9101TGG873HS22884", "", "Toyota", "Corolla", 2005, false,
-//                "LE", "Sedan", "Sedan", 4, "Gasoline", "FWD", "1ZZ-FE", 4, 1.8, "Automatic", 4,
-//                "USA", "Toyota Motor Corp", "3001-3500 lbs", 2, 5));
-//    }
+
+
+    // Make some VINS available by filtering search
+    public void loadCachedVehicles(String filePath) {
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+            String line;
+            String vin = null;
+            String make = "";
+            String model = "";
+            int year = 0;
+
+            while ((line = br.readLine()) != null) {
+                line = line.trim();
+
+                if (line.isEmpty()) continue;
+
+                if (line.matches("^\\w{17}.*")) {
+                    vin = line.split(" ")[0]; // Grab VIN from the first line
+                } else if (line.startsWith("Make:")) {
+                    make = line.substring(5).trim();
+                } else if (line.startsWith("Model:")) {
+                    model = line.substring(6).trim();
+                } else if (line.startsWith("Year:")) {
+                    try {
+                        year = Integer.parseInt(line.substring(5).trim());
+                    } catch (NumberFormatException e) {
+                        System.out.println("Invalid year format: " + line);
+                        year = 0;
+                    }
+                } else if (line.startsWith("]")) {
+                    // End of one vehicle block
+                    if (vin != null && !make.isEmpty() && !model.isEmpty() && year != 0) {
+                        cacheVehicles.add(new Vehicle(vin, "N/A", make, model, year, false));
+                        System.out.println("✅ Cached: " + vin);
+                    } else {
+                        System.out.println("⚠️ Skipping incomplete entry: " + vin);
+                    }
+                    // Reset for next block
+                    vin = null;
+                    make = "";
+                    model = "";
+                    year = 0;
+                }
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
 
     // Perform search & filtering and update GUI results panel
     public void performSearch() {
@@ -165,6 +216,7 @@ public class VINDecoderMain {
         JPanel resultPanel = mainView.getResultPanel();
         resultPanel.removeAll();
 
+        // Holds the returned vehicles
         List<Vehicle> results;
 
         if (!query.isEmpty()) {
@@ -183,7 +235,15 @@ public class VINDecoderMain {
 
             JPanel info = new JPanel();
             info.setLayout(new BoxLayout(info, BoxLayout.Y_AXIS));
-            info.add(new JLabel(v.toString()));
+            if (v.getSaved()) {
+                info.add(new JLabel("Nickname:" + v.getNickname()));
+            } else {
+                info.add(new JLabel("VIN:" + v.getVIN()));
+            }
+            info.add(new JLabel("Model:" + v.getModel()));
+            info.add(new JLabel("Make:" + v.getMake()));
+            info.add(new JLabel("Year:" + v.getYear()));
+
 
             JButton options = new JButton("...");
             options.setPreferredSize(new Dimension(50, 30));
@@ -199,29 +259,31 @@ public class VINDecoderMain {
     }
 
 
-    // Filter logic matching the GUI filter fields
-    private boolean matchesFilter(Vehicle v) {
-        if (mainView == null) return true;
+//    // Filter logic matching the GUI filter fields
+//    private boolean matchesFilter(Vehicle v) {
+//        if (mainView == null) return true;
+//
+//        String year = mainView.getYearBox().getText().trim();
+//        String make = mainView.getMakeBox().getText().trim();
+//        String model = mainView.getModelBox().getText().trim();
+//        String country = mainView.getCountryBox().getText().trim();
+//        String fuel = (String) mainView.getGasType().getSelectedItem();
+//
+//        if (!year.isEmpty() && !String.valueOf(v.getYear()).equals(year)) return false;
+//        if (!make.isEmpty() && !v.getMake().equalsIgnoreCase(make)) return false;
+//        if (!model.isEmpty() && !v.getModel().equalsIgnoreCase(model)) return false;
+//        if (!country.isEmpty() && !v.getPlantCountry().equalsIgnoreCase(country)) return false;
+//        if (mainView.getSavedOnly().isSelected() && !v.getSaved()) return false;
+//
+//        if (fuel != null && !fuel.isEmpty()) {
+//            if (v.getFuelTypePrimary() == null || !v.getFuelTypePrimary().equalsIgnoreCase(fuel)) {
+//                return false;
+//            }
+//        }
+//        return true;
+//    }
 
-        String year = mainView.getYearBox().getText().trim();
-        String make = mainView.getMakeBox().getText().trim();
-        String model = mainView.getModelBox().getText().trim();
-        String country = mainView.getCountryBox().getText().trim();
-        String fuel = (String) mainView.getGasType().getSelectedItem();
 
-        if (!year.isEmpty() && !String.valueOf(v.getYear()).equals(year)) return false;
-        if (!make.isEmpty() && !v.getMake().equalsIgnoreCase(make)) return false;
-        if (!model.isEmpty() && !v.getModel().equalsIgnoreCase(model)) return false;
-        if (!country.isEmpty() && !v.getPlantCountry().equalsIgnoreCase(country)) return false;
-        if (mainView.getSavedOnly().isSelected() && !v.getSaved()) return false;
-
-        if (fuel != null && !fuel.isEmpty()) {
-            if (v.getFuelTypePrimary() == null || !v.getFuelTypePrimary().equalsIgnoreCase(fuel)) {
-                return false;
-            }
-        }
-        return true;
-    }
 
     // Popup menu when clicking vehicle options "..." button
     private void showVehicleOptions(Vehicle vehicle, Component invoker) {
@@ -241,7 +303,11 @@ public class VINDecoderMain {
         }
 
         JMenuItem info = new JMenuItem("Full Information");
-        info.addActionListener(e -> JOptionPane.showMessageDialog(mainView, vehicle.fullDescription(), "Vehicle Info", JOptionPane.INFORMATION_MESSAGE));
+
+        info.addActionListener(e -> {
+                Vehicle full = solidifyVehicle(vehicle);
+                JOptionPane.showMessageDialog(mainView, full.fullDescription(), "Vehicle Info", JOptionPane.INFORMATION_MESSAGE);
+        });
         menu.add(info);
 
         JMenuItem compare = new JMenuItem("Compare Vehicle");
@@ -259,6 +325,8 @@ public class VINDecoderMain {
         menu.show(invoker, invoker.getWidth() / 2, invoker.getHeight() / 2);
     }
 
+
+
     // Method to direct to CompareView GUI once "Compare Vehicle" is clicked
     public void openCompareView(Vehicle vehicle) {
         CompareView compareView = new CompareView(vehicle);
@@ -274,10 +342,8 @@ public class VINDecoderMain {
     }
 
 
-    // TODO (+HOLDEN): MAKE GUI AND WRITE LOGIC TO RETURN WHAT USER HAS TYPED IN SEARCH
-    public String directSearch() {
-        return null;
-    }
+
+
 
     // TODO (+HOLDEN) (+SAUL): WRITE LOGIC TO SEARCH NHTSA AND MYSQL WITH THE GIVEN IDENTIFIER AND RETURN A LIST OF TEMP VEHICLE OBJECTS
     public ArrayList<Vehicle> confirmSearch(String identifier) {
@@ -302,9 +368,9 @@ public class VINDecoderMain {
                             rs.getString("nickname"),
                             rs.getString("V_make"),
                             rs.getString("V_model"),
-                            rs.getInt("V_year")
+                            rs.getInt("V_year"),
+                            true
                     );
-                    vehicle.setIsSaved(true);
                     vehicleList.add(vehicle);
                 }
             }
@@ -336,8 +402,7 @@ public class VINDecoderMain {
                         System.out.println("Invalid year format from API.");
                     }
 
-                    Vehicle vehicle = new Vehicle(identifier, "", make, model, year);
-                    vehicle.setIsSaved(false);
+                    Vehicle vehicle = new Vehicle(identifier, "", make, model, year, false);
                     vehicleList.add(vehicle);
                 } else {
                     System.out.println("NHTSA API call failed with status: " + response.statusCode());
@@ -352,30 +417,62 @@ public class VINDecoderMain {
         return vehicleList;
     }
 
-    private String extractJsonValue(String json, String key) {
-        String searchKey = "\"" + key + "\":\"";
-        int startIndex = json.indexOf(searchKey);
-        if (startIndex == -1) return "";
 
-        startIndex += searchKey.length();
-        int endIndex = json.indexOf("\"", startIndex);
-        if (endIndex == -1) return "";
-
-        return json.substring(startIndex, endIndex);
-    }
 
     // TODO (+HOLDEN) (+SAUL): WRITE LOGIC TO SEARCH FOR THE VEHICLE IN MYSQL AND NHTSA GIVEN AN ARRAY LIST OF ATTRIBUTES
     public ArrayList<Vehicle> confirmFilter(Map<String, String> filterList) {
-        // Only look at saved vehicles by user
+        ArrayList<Vehicle> results = new ArrayList<>();
+
         if (filterList.containsKey("savedOnly")) {
-            return getSavedFilteredVehicles(filterList);
-        } else {
-            // Look at saved vehicles by user and unsaved vehicles
-            ArrayList<Vehicle> results = getSavedFilteredVehicles(filterList);
-            results.addAll(getFilteredNHTSAVehicles(filterList));
+            results.addAll(getSavedFilteredVehicles(filterList));
             return results;
         }
+
+        // Not savedOnly: Merge all three sources
+        Set<Vehicle> merged = new HashSet<>();  // avoids duplicates based on equals/hashCode
+
+        merged.addAll(getSavedFilteredVehicles(filterList));
+        merged.addAll(getFilteredNHTSAVehicles(filterList));
+        merged.addAll(filterCachedVINS(filterList));
+
+        results.addAll(merged);
+        return results;
     }
+
+
+    // Apply filters on the collection of precached vehicles
+    public ArrayList<Vehicle> filterCachedVINS(Map<String, String> filterList) {
+        ArrayList<Vehicle> results = new ArrayList<>();
+
+        for (Vehicle v : cacheVehicles) {
+            boolean matches = true;
+
+            if (filterList.containsKey("make") && !v.getMake().toLowerCase().contains(filterList.get("make").toLowerCase())) {
+                matches = false;
+            }
+            if (filterList.containsKey("model") && !v.getModel().toLowerCase().contains(filterList.get("model").toLowerCase())) {
+                matches = false;
+            }
+            if (filterList.containsKey("year")) {
+                try {
+                    int yearFilter = Integer.parseInt(filterList.get("year"));
+                    if (v.getYear() != yearFilter) {
+                        matches = false;
+                    }
+                } catch (NumberFormatException e) {
+                    matches = false;
+                }
+            }
+
+            if (matches) {
+                results.add(v);
+            }
+        }
+
+        return results;
+    }
+
+
 
     // Helper Method that grabs vehicles in mySQL that match the filters applied by the user
     private ArrayList<Vehicle> getSavedFilteredVehicles(Map<String, String> filterList) {
@@ -438,9 +535,9 @@ public class VINDecoderMain {
                             rs.getString("Nickname"),
                             rs.getString("V_make"),
                             rs.getString("V_model"),
-                            rs.getInt("V_year")
+                            rs.getInt("V_year"),
+                            true // isSaved
                     );
-                    vehicle.setIsSaved(true);
                     results.add(vehicle);
                 }
             }
@@ -453,8 +550,9 @@ public class VINDecoderMain {
         return results;
     }
 
+
+
     // Helper method that grabs vehicles that match the filters the user applied
-    //TODO: Figure out a workaround to not getting vehicle VINs from this method of search
     private ArrayList<Vehicle> getFilteredNHTSAVehicles(Map<String, String> filterList) {
         ArrayList<Vehicle> results = new ArrayList<>();
 
@@ -463,27 +561,42 @@ public class VINDecoderMain {
             String model = filterList.getOrDefault("model", "").trim();
             String sYear = filterList.getOrDefault("year", "").trim();
 
-            // Validate required inputs
-            if (make.isEmpty() || sYear.isEmpty()) {
-                System.out.println("Skipping NHTSA API call: 'make' or 'year' is missing.");
+            if ((make.isEmpty()) && (sYear.isEmpty())) {
+                System.err.println("Skipping NHTSA API call: both 'make' and 'year' are missing.");
                 return results;
             }
 
-            // Build the API URL
-            String apiUrl = String.format(
-                    "https://vpic.nhtsa.dot.gov/api/vehicles/GetModelsForMakeYear/make/%s/modelyear/%s?format=json",
-                    URLEncoder.encode(make, "UTF-8"),
-                    URLEncoder.encode(sYear, "UTF-8")
-            );
+            String apiUrl;
+            boolean useMakeYear = !make.isEmpty() && !sYear.isEmpty();
+            boolean useMakeOnly = !make.isEmpty() && sYear.isEmpty();
+
+            if (useMakeYear) {
+                // Full filter (preferred)
+                apiUrl = String.format(
+                        "https://vpic.nhtsa.dot.gov/api/vehicles/GetModelsForMakeYear/make/%s/modelyear/%s?format=json",
+                        URLEncoder.encode(make, "UTF-8"),
+                        URLEncoder.encode(sYear, "UTF-8")
+                );
+            } else if (useMakeOnly) {
+                // Just make
+                apiUrl = String.format(
+                        "https://vpic.nhtsa.dot.gov/api/vehicles/GetModelsForMake/%s?format=json",
+                        URLEncoder.encode(make, "UTF-8")
+                );
+            } else {
+                // Just year — no direct endpoint for this, so return empty
+                System.err.println("No suitable API endpoint for year-only filtering.");
+                return results;
+            }
 
             System.out.println("Calling NHTSA URL: " + apiUrl);
 
-            // Send the request
+            // Send request
             URL url = new URL(apiUrl);
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("GET");
 
-            // Read the response
+            // Read response
             BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
             StringBuilder content = new StringBuilder();
             String inputLine;
@@ -496,17 +609,20 @@ public class VINDecoderMain {
             // Parse JSON
             JSONObject json = new JSONObject(content.toString());
             JSONArray resultsArray = json.getJSONArray("Results");
-            int year = Integer.parseInt(sYear);
+
+            // Random Year if none is specified
+            int year = sYear.isEmpty() ? yr.nextInt(2025-1990+1) + 1990 : Integer.parseInt(sYear);
 
             for (int i = 0; i < resultsArray.length(); i++) {
                 JSONObject obj = resultsArray.getJSONObject(i);
-                String nhtsaMake = obj.getString("Make_Name");
-                String nhtsaModel = obj.getString("Model_Name");
+                String nhtsaMake = obj.optString("Make_Name", make);
+                String nhtsaModel = obj.optString("Model_Name", "Unknown");
 
                 if (!model.isEmpty() && !nhtsaModel.toLowerCase().contains(model.toLowerCase())) {
                     continue;
                 }
-                Vehicle temp = new Vehicle("<VIN UNKNOWN>", "N/A", nhtsaMake, nhtsaModel, year);
+
+                Vehicle temp = new Vehicle("<VIN UNKNOWN>", "N/A", nhtsaMake, nhtsaModel, year, false);
                 temp.setIsSaved(false);
                 results.add(temp);
             }
@@ -521,14 +637,69 @@ public class VINDecoderMain {
 
 
 
-    // TODO (+SAUL): WRITE LOGIC TO CONVERT A TEMP VEHICLE TO A PERM VEHICLE WITH NHTSA API CALL
+
+
     public Vehicle solidifyVehicle(Vehicle tempVehicle) {
-        Vehicle permVehicle = new Vehicle(tempVehicle.getVIN(), tempVehicle.getNickname(), tempVehicle.getMake(),
-                tempVehicle.getModel(), tempVehicle.getYear(), false, "trim", "vehicleType", "bodyClass", 0, "fuelTypePrimary",
-                "driveType", "engineModel", 1, 2.0, "transmissionStyle", 3, "plantCountry", "manufacturer", "gvwr", 4,
-                4);
-        return permVehicle;
+
+        String vin = tempVehicle.getVIN();
+        String apiUrl = "https://vpic.nhtsa.dot.gov/api/vehicles/DecodeVin/" + vin + "?format=json";
+
+        try {
+            // Establish HTTP connection to API
+            URL url = new URL(apiUrl);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("GET");
+
+            BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+            StringBuilder response = new StringBuilder();
+            String inputLine;
+
+            while ((inputLine = in.readLine()) != null) {
+                response.append(inputLine);
+            }
+
+            in.close();
+
+            JSONObject json = new JSONObject(response.toString());
+            JSONArray results = json.getJSONArray("Results");
+
+            // Extract useful fields
+            String trim = getValue(results, "Trim");
+            String vehicleType = getValue(results, "Vehicle Type");
+            String bodyClass = getValue(results, "Body Class");
+            int doors = parseInt(getValue(results, "Doors"));
+            String fuelTypePrimary = getValue(results, "FuelType - Primary");
+            String driveType = getValue(results, "Drive Type");
+            String engineModel = getValue(results, "Engine Model");
+            int engineCylinders = parseInt(getValue(results, "Engine Cylinders"));
+            double displacement = parseDouble(getValue(results, "Displacement (L)"));
+            String transmissionStyle = getValue(results, "Transmission Style");
+            int transmissionSpeeds = parseInt(getValue(results, "Transmission Speeds"));
+            String plantCountry = getValue(results, "Plant Country");
+            String manufacturer = getValue(results, "Manufacturer");
+            String gvwr = getValue(results, "GVWR");
+            int seatRows = parseInt(getValue(results, "Number of Seat Rows")); // Substitute if needed
+            int seats = parseInt(getValue(results, "Seats"));
+            System.out.println(results.toString(2));
+
+
+
+            Vehicle permVehicle = new Vehicle(tempVehicle.getVIN(), tempVehicle.getNickname(), tempVehicle.getMake(),
+                    tempVehicle.getModel(), tempVehicle.getYear(), false, trim, vehicleType, bodyClass, doors, fuelTypePrimary,
+                    driveType, engineModel, engineCylinders, displacement, transmissionStyle, transmissionSpeeds, plantCountry,
+                    manufacturer, gvwr, seatRows,
+                    seats);
+            System.out.println(permVehicle.fullDescription());
+            return permVehicle;
+
+        } catch (Exception e) {
+            System.err.println("Failed to retrieve data from NHTSA: " + e.getMessage());
+            e.printStackTrace();
+            return tempVehicle; // Fallback to original
+        }
     }
+
+
 
     // TODO (+HOLDEN) (+SAUL): WRITE LOGIC TO SAVE VEHICLE OBJECT TO MYSQL
     public void saveVehicle(Vehicle vehicle, int userId) {
@@ -575,6 +746,8 @@ public class VINDecoderMain {
         }
     }
 
+
+
     // TODO (+HOLDEN) (+SAUL): WRITE LOGIC TO REMOVE VEHICLE OBJECT FROM MYSQL
     public void removeVehicle(Vehicle vehicle, int userId) {
 
@@ -600,14 +773,59 @@ public class VINDecoderMain {
         }
     }
 
+
+
     // TODO (+HOLDEN): WRITE GUI LOGIC TO OPEN A TEXT BOX AND TAKE USER INPUT FROM A RESULTING PROMPT BOX
     public void editName(Vehicle vehicle) {
         String newName = "new name";
         vehicle.setNickname(newName);
     }
 
+
+
     public static void main(String[] args) {
         VINDecoderMain decoder = new VINDecoderMain();
         decoder.run();
+    }
+
+    // === JSON HELPER METHODS ====
+    private String extractJsonValue(String json, String key) {
+        String searchKey = "\"" + key + "\":\"";
+        int startIndex = json.indexOf(searchKey);
+        if (startIndex == -1) return "";
+
+        startIndex += searchKey.length();
+        int endIndex = json.indexOf("\"", startIndex);
+        if (endIndex == -1) return "";
+
+        return json.substring(startIndex, endIndex);
+    }
+
+    // JSON to help parse return values from NHTSA
+    private String getValue(JSONArray results, String variableName) {
+        for (int i = 0; i < results.length(); i++) {
+            JSONObject obj = results.getJSONObject(i);
+            if (variableName.equalsIgnoreCase(obj.optString("Variable"))) {
+                Object valueObj = obj.opt("Value");
+                return valueObj != null ? valueObj.toString() : "";
+            }
+        }
+        return "";
+    }
+
+    private int parseInt(String val) {
+        try {
+            return Integer.parseInt(val);
+        } catch (Exception e) {
+            return 0;
+        }
+    }
+
+    private double parseDouble(String val) {
+        try {
+            return Double.parseDouble(val);
+        } catch (Exception e) {
+            return 0.0;
+        }
     }
 }
