@@ -1,19 +1,17 @@
-<<<<<<< Updated upstream:GUIFiles/LoginScreen.java
-package GUIFiles;
-=======
-// delete me
->>>>>>> Stashed changes:src/LoginScreen.java
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
 
 public class LoginScreen extends JFrame {
     private JTextField usernameField;
     private JPasswordField passwordField;
     private JButton guestButton, confirmButton;
 
-    public LoginScreen() {
+    private VINDecoderMain mainSystem;
+
+
+    public LoginScreen(VINDecoderMain mainSystem) {
+        this.mainSystem = mainSystem;
         setTitle("vBreed Login");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setSize(400, 250);
@@ -48,6 +46,7 @@ public class LoginScreen extends JFrame {
 
         guestButton = new JButton("Continue as Guest");
         guestButton.setBounds(40, 150, 150, 30);
+        guestButton.setBackground(Color.YELLOW);
         panel.add(guestButton);
 
         confirmButton = new JButton("Confirm");
@@ -64,23 +63,24 @@ public class LoginScreen extends JFrame {
         String username = usernameField.getText().trim();
         String password = new String(passwordField.getPassword());
 
+        // Error: Fields left blank
         if (username.isEmpty() || password.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Username or password fields cannot be left blank.", "Login Error", JOptionPane.ERROR_MESSAGE);
-        } else if (username.equals("existingAccount") && password.equals("correctPassword")) {
+        }
+
+        // Attempt Login on VINDecoderMain with database
+        String attemptLog = mainSystem.tryLogin(username, password);
+
+        // If login successful
+        if(attemptLog.equals("Login Successful!") || attemptLog.equals("Account Created!")) {
             goToMainScreen();
-        } else if (username.equals("existingAccount")) {
-            JOptionPane.showMessageDialog(this, "Someone with this username exists but the password is incorrect.", "Login Error", JOptionPane.ERROR_MESSAGE);
         } else {
-            goToMainScreen(); // default fallback for demo
+            // Login failed message
+            JOptionPane.showMessageDialog(this, attemptLog, "Login Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
     private void goToMainScreen() {
-        new MainView().setVisible(true);
-        dispose();
-    }
-
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> new LoginScreen().setVisible(true));
+        mainSystem.onLoginSuccess();
     }
 }

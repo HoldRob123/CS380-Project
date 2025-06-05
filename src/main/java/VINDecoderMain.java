@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
 public class VINDecoderMain {
 
     // Database credentials
-    private static final String DB_URL = "jdbc:mysql://10.10.10.64:3306/vin_decoder_db?useSSL=false&serverTimezone=UTC";;
+    private static final String DB_URL = "jdbc:mysql://localhost:3306/vin_decoder_db?useSSL=false&serverTimezone=UTC";;
     private static final String DB_USERNAME = "GEN_USE";
     private static final String DB_PASSWORD = "pass1";
 
@@ -99,7 +99,7 @@ public class VINDecoderMain {
     // Helper method to tryLogin that will insert a new user entry in mySQL
     private static void createUser(String username, String password) {
         String checkSql = "SELECT COUNT(*) FROM users WHERE userName = ?";
-        String insertSql = "INSERT INTO users (userName, userPassword) VALUES (?, ?)";
+        String insertSql = "INSERT INTO users (username, password) VALUES (?, ?)";
 
         try (Connection connect = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD)) {
 
@@ -129,23 +129,22 @@ public class VINDecoderMain {
         }
         mainView = new MainView(this);
         mainView.setVisible(true);
-        fakeData();
         performSearch();
     }
 
     // Fake data for testing; replace with DB or API calls later
-    private void fakeData() {
-        vehicleDatabase = new ArrayList<>();
-        vehicleDatabase.add(new Vehicle("934892HAD84R319573", "Project Car", "Honda", "Accord", 2002, true,
-                "EX", "Sedan", "Coupe", 4, "Gasoline", "FWD", "K24A4", 4, 2.4, "Automatic", 5,
-                "Japan", "Honda Motor Co", "3501-4000 lbs", 2, 5));
-        vehicleDatabase.add(new Vehicle("548622G0BU6381355", "Lucy", "Honda", "Civic", 1997, true,
-                "DX", "Sedan", "Sedan", 4, "Gasoline", "FWD", "D16Y7", 4, 1.6, "Manual", 5,
-                "USA", "Honda Mfg", "3001-3500 lbs", 2, 5));
-        vehicleDatabase.add(new Vehicle("9101TGG873HS22884", "", "Toyota", "Corolla", 2005, false,
-                "LE", "Sedan", "Sedan", 4, "Gasoline", "FWD", "1ZZ-FE", 4, 1.8, "Automatic", 4,
-                "USA", "Toyota Motor Corp", "3001-3500 lbs", 2, 5));
-    }
+//    private void fakeData() {
+//        vehicleDatabase = new ArrayList<>();
+//        vehicleDatabase.add(new Vehicle("934892HAD84R319573", "Project Car", "Honda", "Accord", 2002, true,
+//                "EX", "Sedan", "Coupe", 4, "Gasoline", "FWD", "K24A4", 4, 2.4, "Automatic", 5,
+//                "Japan", "Honda Motor Co", "3501-4000 lbs", 2, 5));
+//        vehicleDatabase.add(new Vehicle("548622G0BU6381355", "Lucy", "Honda", "Civic", 1997, true,
+//                "DX", "Sedan", "Sedan", 4, "Gasoline", "FWD", "D16Y7", 4, 1.6, "Manual", 5,
+//                "USA", "Honda Mfg", "3001-3500 lbs", 2, 5));
+//        vehicleDatabase.add(new Vehicle("9101TGG873HS22884", "", "Toyota", "Corolla", 2005, false,
+//                "LE", "Sedan", "Sedan", 4, "Gasoline", "FWD", "1ZZ-FE", 4, 1.8, "Automatic", 4,
+//                "USA", "Toyota Motor Corp", "3001-3500 lbs", 2, 5));
+//    }
 
     // Perform search & filtering and update GUI results panel
     public void performSearch() {
