@@ -269,24 +269,12 @@ public class VINDecoderMain {
     private void showVehicleOptions(Vehicle vehicle, Component invoker) {
         JPopupMenu menu = new JPopupMenu();
 
-        if (vehicle.getNickname() != null && !vehicle.getNickname().isEmpty()) {
-            JMenuItem edit = new JMenuItem("Edit Name");
-            edit.addActionListener(e -> {
-                String newName = JOptionPane.showInputDialog(mainView, "New nickname:", vehicle.getNickname());
-                if (newName != null && !newName.trim().isEmpty()) {
-                    vehicle.setNickname(newName.trim());
-                    JOptionPane.showMessageDialog(mainView, "Nickname updated.");
-                    performSearch();
-                }
-            });
-            menu.add(edit);
-        }
-
+        // Always show these options
         JMenuItem info = new JMenuItem("Full Information");
-
         info.addActionListener(e -> {
-                Vehicle full = solidifyVehicle(vehicle);
-                JOptionPane.showMessageDialog(mainView, full.fullDescription(), "Vehicle Info", JOptionPane.INFORMATION_MESSAGE);
+            Vehicle full = solidifyVehicle(vehicle);
+            JOptionPane.showMessageDialog(mainView, full.fullDescription(),
+                    "Vehicle Info", JOptionPane.INFORMATION_MESSAGE);
         });
         menu.add(info);
 
@@ -294,15 +282,112 @@ public class VINDecoderMain {
         compare.addActionListener(e -> openCompareView(vehicle));
         menu.add(compare);
 
-        JMenuItem remove = new JMenuItem("Remove from Saved");
-        remove.addActionListener(e -> {
-            vehicle.setIsSaved(false);
-            JOptionPane.showMessageDialog(mainView, "Removed from saved.");
-            performSearch();
-        });
-        menu.add(remove);
+        // Dynamic options based on saved status
+        if (vehicle.getSaved()) {
+            // Options for saved vehicles
+            JMenuItem edit = new JMenuItem("Edit Nickname");
+            edit.addActionListener(e -> {
+                String newName = JOptionPane.showInputDialog(mainView,
+                        "New nickname:", vehicle.getNickname());
+                if (newName != null && !newName.trim().isEmpty()) {
+                    vehicle.setNickname(newName.trim());
+                    try (Connection conn = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD)) {
+                        String sql = "UPDATE vehicles SET nickname = ? WHERE VIN_NUMBER = ? AND userID = ?";
+                        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+                            stmt.setString(1, vehicle.getNickname());
+                            stmt.setString(2, vehicle.getVIN());
+                            stmt.setInt(3, currentUserID);
+                            stmt.executeUpdate();
+                            JOptionPane.showMessageDialog(mainView, "Nickname updated successfully!");
+                            performSearch();
+                        }
+                    } catch (SQLException ex) {
+                        JOptionPane.showMessageDialog(mainView, "Error updating nickname: " + ex.getMessage(),
+                                "Database Error", JOptionPane.ERROR_MESSAGE);
+                    }
+                }
+            });
+            menu.add(edit);
+
+            JMenuItem remove = new JMenuItem("Remove from Saved");
+            remove.addActionListener(e -> {
+                int confirm = JOptionPane.showConfirmDialog(mainView,
+                        "Are you sure you want to remove this vehicle from your saved vehicles?",
+                        "Confirm Removal", JOptionPane.YES_NO_OPTION);
+
+                if (confirm == JOptionPane.YES_OPTION) {
+                    try (Connection conn = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD)) {
+                        removeVehicle(vehicle, currentUserID);
+                        vehicle.setIsSaved(false);
+                        JOptionPane.showMessageDialog(mainView, "Vehicle removed from saved.");
+                        performSearch();
+                    } catch (SQLException ex) {
+                        JOptionPane.showMessageDialog(mainView, "Error removing vehicle: " + ex.getMessage(),
+                                "Database Error", JOptionPane.ERROR_MESSAGE);
+                    }
+                }
+            });
+            menu.add(remove);
+        } else {
+            // Option for unsaved vehicles
+            JMenuItem save = new JMenuItem("Save Vehicle");
+            save.addActionListener(e -> {
+                String nickname = vehicle.getNickname();
+                if (nickname == null || nickname.isEmpty()) {
+                    nickname = JOptionPane.showInputDialog(mainView,
+                            "Enter a nickname for this vehicle:");
+                    if (nickname == null || nickname.trim().isEmpty()) {
+                        JOptionPane.showMessageDialog(mainView,
+                                "Vehicle must have a nickname to be saved.");
+                        return;
+                    }
+                    vehicle.setNickname(nickname.trim());
+                }
+
+                try (Connection conn = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD)) {
+                    // Get user ID if not already set
+                    if (currentUserID == -1) {
+                        String sql = "SELECT userID FROM users WHERE userName = ?";
+                        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+                            stmt.setString(1, currentUser);
+                            ResultSet rs = stmt.executeQuery();
+                            if (rs.next()) {
+                                currentUserID = rs.getInt("userID");
+                            }
+                        }
+                    }
+
+                    if (!vehicleExistsInDB(vehicle.getVIN(), currentUserID)) {
+                        Vehicle vehicleToSave = solidifyVehicle(vehicle);
+                        vehicleToSave.setIsSaved(true);
+                        saveVehicle(vehicleToSave, currentUserID);
+                        JOptionPane.showMessageDialog(mainView, "Vehicle saved successfully!");
+                        performSearch();
+                    } else {
+                        JOptionPane.showMessageDialog(mainView,
+                                "This vehicle is already in your saved vehicles.");
+                    }
+                } catch (SQLException ex) {
+                    JOptionPane.showMessageDialog(mainView, "Error saving vehicle: " + ex.getMessage(),
+                            "Database Error", JOptionPane.ERROR_MESSAGE);
+                }
+            });
+            menu.add(save);
+        }
 
         menu.show(invoker, invoker.getWidth() / 2, invoker.getHeight() / 2);
+    }
+
+    // Helper method to check if vehicle exists in db
+    private boolean vehicleExistsInDB(String vin, int userId) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM vehicles WHERE VIN_NUMBER = ? AND userID = ?";
+        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD);
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, vin);
+            stmt.setInt(2, userId);
+            ResultSet rs = stmt.executeQuery();
+            return rs.next() && rs.getInt(1) > 0;
+        }
     }
 
 
