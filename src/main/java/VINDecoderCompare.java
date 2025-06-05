@@ -32,37 +32,15 @@ public class VINDecoderCompare {
         });
     }
 
-    public void reselectVehicleB() {
-        if (vehicleA == null) return;
-
-        String currentSearch = compareView.getSearchFieldText();
-        if (currentSearch != null && !currentSearch.isEmpty()) {
-            handleSearch(currentSearch);
-        } else {
-            compareView.showMessage("Please enter a search term first",
-                    "Search Needed", JOptionPane.INFORMATION_MESSAGE);
-        }
-    }
-
-    public void returnToMainView() {
-        if (compareView != null) {
-            compareView.dispose();
-        }
-        mainApp.getMainView().setVisible(true);
-    }
-
     public void handleSearch(String query) {
         if (query == null || query.trim().isEmpty()) {
             compareView.showMessage("Please enter a search term", "Search Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
-        mainApp.getMainView().getSearchField().setText(query);
-        mainApp.performSearch();
-
-        List<Vehicle> results = mainApp.getVehicleDatabase().stream()
-                .filter(v -> !v.getVIN().equals(vehicleA.getVIN()))
-                .filter(v -> matchesSearchCriteria(v, query))
+        // Use mainApp's confirmSearch to get real vehicles
+        List<Vehicle> results = mainApp.confirmSearch(query).stream()
+                .filter(v -> !v.getVIN().equals(vehicleA.getVIN())) // Exclude vehicleA
                 .collect(Collectors.toList());
 
         if (results.isEmpty()) {
@@ -126,7 +104,6 @@ public class VINDecoderCompare {
         result.append(String.format("%-30s | %-30s | %-30s%n", "Attribute", "Vehicle A", "Vehicle B"));
         result.append("-".repeat(95)).append("\n");
 
-        // Compare all attributes
         compareAttribute(result, "VIN", vehicleA.getVIN(), vehicleB.getVIN());
         compareAttribute(result, "Nickname",
                 vehicleA.getNickname() != null ? vehicleA.getNickname() : "N/A",
@@ -162,13 +139,22 @@ public class VINDecoderCompare {
                 highlight + (valueB != null ? valueB : "N/A") + highlight));
     }
 
-    // Getter for vehicle database from parent class
-
-    public Vehicle getVehicleA() {
-        return vehicleA;
+    public void returnToMainView() {
+        if (compareView != null) {
+            compareView.dispose();
+        }
+        mainApp.getMainView().setVisible(true);
     }
 
-    public Vehicle getVehicleB() {
-        return vehicleB;
+    public void reselectVehicleB() {
+        if (vehicleA == null) return;
+
+        String currentSearch = compareView.getSearchFieldText();
+        if (currentSearch != null && !currentSearch.isEmpty()) {
+            handleSearch(currentSearch);
+        } else {
+            compareView.showMessage("Please enter a search term first",
+                    "Search Needed", JOptionPane.INFORMATION_MESSAGE);
+        }
     }
 }

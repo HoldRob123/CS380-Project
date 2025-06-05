@@ -18,6 +18,7 @@ public class MainView extends JFrame {
     public MainView(VINDecoderMain mainApp) {
         this(); // call default constructor for GUI setup
         this.mainApp = mainApp;
+        mainApp.setMainView(this);
     }
 
     public MainView() {

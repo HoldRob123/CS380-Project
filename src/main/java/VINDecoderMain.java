@@ -65,8 +65,13 @@ public class VINDecoderMain {
         });
     }
 
+    public void setMainView(MainView mainView) {
+        this.mainView = mainView;
+    }
 
-
+    public MainView getMainView() {
+        return mainView;
+    }
 
     // logs in based on the credentials the user has entered
     // TODO (+SAUL) TEST DATABASE WITH THIS METHOD!
@@ -304,18 +309,8 @@ public class VINDecoderMain {
 
     // Method to direct to CompareView GUI once "Compare Vehicle" is clicked
     public void openCompareView(Vehicle vehicle) {
-        VINDecoderMain mainSystem = new VINDecoderMain();
-        VINDecoderCompare compare = new VINDecoderCompare(mainSystem);
-        CompareView compareView = new CompareView(compare);
-        compareView.setVisible(true);
-        mainView.setVisible(false);  // hide the main view
-        // Add a WindowListener to show mainView back when compareView is closed
-        compareView.addWindowListener(new java.awt.event.WindowAdapter() {
-            @Override
-            public void windowClosed(java.awt.event.WindowEvent e) {
-                mainView.setVisible(true);  // show main view again when compareView closes
-            }
-        });
+        VINDecoderCompare compareApp = new VINDecoderCompare(this); // Pass the current instance
+        compareApp.run(vehicle);
     }
 
 
