@@ -1,77 +1,106 @@
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
 public class CompareView extends JFrame {
-
     private JTextField searchField;
-    private JTextArea withListingArea;
-    private JPanel comparePanel;
-    private JLabel compareLabel;
-    private Vehicle compareVehicle;
+    private JTextArea vehicleADescArea;
+    private JTextArea vehicleBDescArea;
+    private VINDecoderCompare controller;
 
-    public CompareView(Vehicle compareVehicle) {
-        this.compareVehicle = compareVehicle;
+    public CompareView(VINDecoderCompare controller) {
+        this.controller = controller;
+        setupUI();
+    }
 
+    private void setupUI() {
         setTitle("Compare View");
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);  // dispose only, so main view stays
-        setSize(600, 500);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setSize(1000, 600);
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
 
-        comparePanel = new JPanel();
-        comparePanel.setLayout(new BoxLayout(comparePanel, BoxLayout.Y_AXIS));
-        comparePanel.setBorder(BorderFactory.createTitledBorder("COMPARE"));
-
-        // Format vehicle info nicely for label (multi-line label with HTML)
-        String compareInfo = "<html>VIN: " + compareVehicle.getVIN() + "<br>" +
-                "Make: " + compareVehicle.getMake() + "<br>" +
-                "Model: " + compareVehicle.getModel() + "<br>" +
-                "Year: " + compareVehicle.getYear() + "</html>";
-        compareLabel = new JLabel(compareInfo);
-        comparePanel.add(compareLabel);
-
-        JPanel withPanel = new JPanel(new BorderLayout());
-        withPanel.setBorder(BorderFactory.createTitledBorder("WITH"));
-
-        JPanel searchPanel = new JPanel(new BorderLayout());
-        searchField = new JTextField();
-        JButton confirmButton = new JButton("Confirm");
-
-        searchPanel.add(searchField, BorderLayout.CENTER);
-        searchPanel.add(confirmButton, BorderLayout.EAST);
-
-        withListingArea = new JTextArea();
-        withListingArea.setEditable(false);
-        withListingArea.setText("Type to search for vehicles to compare with...");
-
-        JScrollPane scrollPane = new JScrollPane(withListingArea);
-
-        withPanel.add(searchPanel, BorderLayout.NORTH);
-        withPanel.add(scrollPane, BorderLayout.CENTER);
-
+        // Top Panel with back button
         JButton backButton = new JButton("<- Back");
-        backButton.addActionListener(e -> this.dispose());
+        backButton.addActionListener(e -> controller.returnToMainView());
+
+        JButton analyzeButton = new JButton("Analyze Comparison");
+        analyzeButton.addActionListener(e -> controller.performComparison());
 
         JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.add(backButton, BorderLayout.WEST);
-        topPanel.add(comparePanel, BorderLayout.CENTER);
-
+        topPanel.add(analyzeButton, BorderLayout.EAST);
         add(topPanel, BorderLayout.NORTH);
-        add(withPanel, BorderLayout.CENTER);
 
-        setVisible(true);
+        // Search panel
+        JPanel searchPanel = new JPanel(new BorderLayout());
+        searchField = new JTextField();
+        JButton searchButton = new JButton("Search");
+        searchButton.addActionListener(e -> controller.handleSearch(searchField.getText()));
 
-        confirmButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String query = searchField.getText();
-                // TODO: Implement real search logic here
-                withListingArea.setText("Showing results for: " + query +
-                        "\n\nVIN: 548622G06UJG318535\nMake: Honda\nModel: Civic\nYear: 1997\n\n[select]");
-            }
-        });
+        searchPanel.add(searchField, BorderLayout.CENTER);
+        searchPanel.add(searchButton, BorderLayout.EAST);
+        add(searchPanel, BorderLayout.SOUTH);
+
+        // Comparison Panel
+        JPanel comparisonPanel = new JPanel(new GridLayout(1, 2));
+        vehicleADescArea = createDescriptionArea("Vehicle A");
+        vehicleBDescArea = createDescriptionArea("Vehicle B (Select a vehicle to compare)");
+
+        comparisonPanel.add(new JScrollPane(vehicleADescArea));
+        comparisonPanel.add(new JScrollPane(vehicleBDescArea));
+        add(comparisonPanel, BorderLayout.CENTER);
+
+        // Reselect Button
+        JButton reselectButton = new JButton("Reselect Vehicle");
+        reselectButton.addActionListener(e -> controller.reselectVehicleB());
+
+        JPanel button1Panel = new JPanel(new FlowLayout());
+        button1Panel.add(reselectButton);
+        button1Panel.add(analyzeButton);
+
+        topPanel.add(button1Panel, BorderLayout.EAST);
+    }
+
+    public String getSearchFieldText() {
+        return searchField.getText();
+    }
+
+    private JTextArea createDescriptionArea(String title) {
+        JTextArea area = new JTextArea();
+        area.setEditable(false);
+        area.setLineWrap(true);
+        area.setWrapStyleWord(true);
+        area.setBorder(BorderFactory.createTitledBorder(title));
+        return area;
+    }
+
+    public void displayVehicleA(Vehicle vehicle) {
+        vehicleADescArea.setText(vehicle.fullDescription());
+        vehicleADescArea.setBorder(BorderFactory.createTitledBorder(
+                "Vehicle A: " + vehicle.getYear() + " " + vehicle.getMake() + " " + vehicle.getModel()));
+    }
+
+    public void displayVehicleB(Vehicle vehicle) {
+        vehicleBDescArea.setText(vehicle.fullDescription());
+        vehicleBDescArea.setBorder(BorderFactory.createTitledBorder(
+                "Vehicle B: " + vehicle.getYear() + " " + vehicle.getMake() + " " + vehicle.getModel()));
+    }
+
+    public void showMessage(String message, String title, int messageType) {
+        JOptionPane.showMessageDialog(this, message, title, messageType);
+    }
+
+    public void showComparisonResult(String result) {
+        JTextArea textArea = new JTextArea(result);
+        textArea.setEditable(false);
+        textArea.setFont(new Font("Monospaced", Font.PLAIN, 12));
+
+        JScrollPane scrollPane = new JScrollPane(textArea);
+        scrollPane.setPreferredSize(new Dimension(900, 400));
+
+        JOptionPane.showMessageDialog(this, scrollPane, "Comparison Result", JOptionPane.PLAIN_MESSAGE);
     }
 }

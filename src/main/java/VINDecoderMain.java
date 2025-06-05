@@ -57,7 +57,7 @@ public class VINDecoderMain {
     // Facilitator method for main screen
     public void run() {
         // Loads Vehicle Cache
-        loadCachedVehicles("C:\\Users\\isaka\\OneDrive\\Documents\\GitHub\\cs380project\\src\\main\\java\\textfiles\\vinresults.txt");
+        loadCachedVehicles("cs380project\\src\\main\\java\\textfiles\\vinresults.txt");
         // Launches Login Page
         SwingUtilities.invokeLater(() -> {
             LoginScreen loginScreen = new LoginScreen(this);
@@ -259,31 +259,6 @@ public class VINDecoderMain {
     }
 
 
-//    // Filter logic matching the GUI filter fields
-//    private boolean matchesFilter(Vehicle v) {
-//        if (mainView == null) return true;
-//
-//        String year = mainView.getYearBox().getText().trim();
-//        String make = mainView.getMakeBox().getText().trim();
-//        String model = mainView.getModelBox().getText().trim();
-//        String country = mainView.getCountryBox().getText().trim();
-//        String fuel = (String) mainView.getGasType().getSelectedItem();
-//
-//        if (!year.isEmpty() && !String.valueOf(v.getYear()).equals(year)) return false;
-//        if (!make.isEmpty() && !v.getMake().equalsIgnoreCase(make)) return false;
-//        if (!model.isEmpty() && !v.getModel().equalsIgnoreCase(model)) return false;
-//        if (!country.isEmpty() && !v.getPlantCountry().equalsIgnoreCase(country)) return false;
-//        if (mainView.getSavedOnly().isSelected() && !v.getSaved()) return false;
-//
-//        if (fuel != null && !fuel.isEmpty()) {
-//            if (v.getFuelTypePrimary() == null || !v.getFuelTypePrimary().equalsIgnoreCase(fuel)) {
-//                return false;
-//            }
-//        }
-//        return true;
-//    }
-
-
 
     // Popup menu when clicking vehicle options "..." button
     private void showVehicleOptions(Vehicle vehicle, Component invoker) {
@@ -329,7 +304,9 @@ public class VINDecoderMain {
 
     // Method to direct to CompareView GUI once "Compare Vehicle" is clicked
     public void openCompareView(Vehicle vehicle) {
-        CompareView compareView = new CompareView(vehicle);
+        VINDecoderMain mainSystem = new VINDecoderMain();
+        VINDecoderCompare compare = new VINDecoderCompare(mainSystem);
+        CompareView compareView = new CompareView(compare);
         compareView.setVisible(true);
         mainView.setVisible(false);  // hide the main view
         // Add a WindowListener to show mainView back when compareView is closed
