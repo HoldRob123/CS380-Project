@@ -34,7 +34,7 @@ import java.util.stream.Collectors;
 public class VINDecoderMain {
 
     // Database credentials
-    private static final String DB_URL = "jdbc:mysql://192.168.0.13:3306/vin_vehicle_db?useSSL=false&serverTimezone=UTC";;
+    private static final String DB_URL = "jdbc:mysql://localhost:3306/vin_vehicle_db?allowPublicKeyRetrieval=true&useSSL=false";
     private static final String DB_USERNAME = "GEN_USE";
     private static final String DB_PASSWORD = "pass1";
 
