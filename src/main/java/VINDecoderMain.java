@@ -34,7 +34,7 @@ import java.util.stream.Collectors;
 public class VINDecoderMain {
 
     // Database credentials
-    private static final String DB_URL = "jdbc:mysql://192.168.0.13:3306/vin_decoder_db?useSSL=false&serverTimezone=UTC";;
+    private static final String DB_URL = "jdbc:mysql://192.168.0.13:3306/vin_vehicle_db?useSSL=false&serverTimezone=UTC";;
     private static final String DB_USERNAME = "GEN_USE";
     private static final String DB_PASSWORD = "pass1";
 
@@ -43,12 +43,24 @@ public class VINDecoderMain {
     public int currentUserID = -1;
 
     // Fake Data
-    private List<Vehicle> vehicleDatabase;
+    protected List<Vehicle> vehicleDatabase;
 
     // GUI References
     private LoginScreen loginScreen;
     private CompareView compareView;
     public MainView mainView;
+
+    public void setMainView(MainView mainView) {
+        this.mainView = mainView;
+    }
+
+    public MainView getMainView() {
+        return mainView;
+    }
+
+    public List<Vehicle> getVehicleDatabase() {
+        return vehicleDatabase;
+    }
 
     // Facilitator method for main screen
     public void run() {
@@ -144,6 +156,12 @@ public class VINDecoderMain {
         vehicleDatabase.add(new Vehicle("9101TGG873HS22884", "", "Toyota", "Corolla", 2005, false,
                 "LE", "Sedan", "Sedan", 4, "Gasoline", "FWD", "1ZZ-FE", 4, 1.8, "Automatic", 4,
                 "USA", "Toyota Motor Corp", "3001-3500 lbs", 2, 5));
+        vehicleDatabase.add(new Vehicle("9101TGG873HS22884", "", "Toyota", "Corolla", 2005, false,
+                "LE", "Sedan", "Sedan", 4, "Gasoline", "FWD", "1ZZ-FE", 4, 1.8, "Automatic", 4,
+                "USA", "Toyota Motor Corp", "3001-3500 lbs", 2, 5));
+        vehicleDatabase.add(new Vehicle("9101TGG873HS22884", "", "Toyota", "Corolla", 2005, false,
+                "LE", "Sedan", "Sedan", 4, "Gasoline", "FWD", "1ZZ-FE", 4, 1.8, "Automatic", 4,
+                "USA", "Toyota Motor Corp", "3001-3500 lbs", 2, 5));
     }
 
     // Perform search & filtering and update GUI results panel
@@ -236,8 +254,12 @@ public class VINDecoderMain {
         menu.add(info);
 
         JMenuItem compare = new JMenuItem("Compare Vehicle");
-        compare.addActionListener(e -> openCompareView(vehicle));
+        compare.addActionListener(e -> {
+            VINDecoderCompare compareApp = new VINDecoderCompare(VINDecoderMain.this);
+            compareApp.run(vehicle);
+        });
         menu.add(compare);
+
 
         JMenuItem remove = new JMenuItem("Remove from Saved");
         remove.addActionListener(e -> {
@@ -250,19 +272,19 @@ public class VINDecoderMain {
         menu.show(invoker, invoker.getWidth() / 2, invoker.getHeight() / 2);
     }
 
-    // Method to direct to CompareView GUI once "Compare Vehicle" is clicked
-    public void openCompareView(Vehicle vehicle) {
-        CompareView compareView = new CompareView(vehicle);
-        compareView.setVisible(true);
-        mainView.setVisible(false);  // hide the main view
-        // Add a WindowListener to show mainView back when compareView is closed
-        compareView.addWindowListener(new java.awt.event.WindowAdapter() {
-            @Override
-            public void windowClosed(java.awt.event.WindowEvent e) {
-                mainView.setVisible(true);  // show main view again when compareView closes
-            }
-        });
-    }
+//    // Method to direct to CompareView GUI once "Compare Vehicle" is clicked
+//    public void openCompareView(Vehicle vehicle) {
+//        CompareView compareView = new CompareView(vehicle);
+//        compareView.setVisible(true);
+//        mainView.setVisible(false);  // hide the main view
+//        // Add a WindowListener to show mainView back when compareView is closed
+//        compareView.addWindowListener(new java.awt.event.WindowAdapter() {
+//            @Override
+//            public void windowClosed(java.awt.event.WindowEvent e) {
+//                mainView.setVisible(true);  // show main view again when compareView closes
+//            }
+//        });
+//    }
 
 
     // TODO (+HOLDEN): MAKE GUI AND WRITE LOGIC TO RETURN WHAT USER HAS TYPED IN SEARCH
