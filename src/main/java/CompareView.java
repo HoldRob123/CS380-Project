@@ -2,13 +2,12 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
 
 public class CompareView extends JFrame {
     private JTextField searchField;
     private JTextArea vehicleADescArea;
     private JTextArea vehicleBDescArea;
-    private VINDecoderCompare controller;
+    private final VINDecoderCompare controller;
 
     public CompareView(VINDecoderCompare controller) {
         this.controller = controller;
@@ -22,16 +21,28 @@ public class CompareView extends JFrame {
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
 
-        // Top Panel with back button
-        JButton backButton = new JButton("<- Back");
-        backButton.addActionListener(e -> controller.returnToMainView());
+        // Top Panel with buttons
+        JPanel topPanel = new JPanel(new BorderLayout());
 
+        // Back button
+        JButton backButton = new JButton("← Back");
+        backButton.addActionListener(e -> controller.returnToMainView());
+        topPanel.add(backButton, BorderLayout.WEST);
+
+        // Button panel for right side
+        JPanel buttonPanel = new JPanel(new FlowLayout());
+
+        // Reselect button
+        JButton reselectButton = new JButton("Reselect Vehicle B");
+        reselectButton.addActionListener(e -> controller.reselectVehicleB());
+        buttonPanel.add(reselectButton);
+
+        // Analyze button
         JButton analyzeButton = new JButton("Analyze Comparison");
         analyzeButton.addActionListener(e -> controller.performComparison());
+        buttonPanel.add(analyzeButton);
 
-        JPanel topPanel = new JPanel(new BorderLayout());
-        topPanel.add(backButton, BorderLayout.WEST);
-        topPanel.add(analyzeButton, BorderLayout.EAST);
+        topPanel.add(buttonPanel, BorderLayout.EAST);
         add(topPanel, BorderLayout.NORTH);
 
         // Search panel
@@ -39,7 +50,6 @@ public class CompareView extends JFrame {
         searchField = new JTextField();
         JButton searchButton = new JButton("Search");
         searchButton.addActionListener(e -> controller.handleSearch(searchField.getText()));
-
         searchPanel.add(searchField, BorderLayout.CENTER);
         searchPanel.add(searchButton, BorderLayout.EAST);
         add(searchPanel, BorderLayout.SOUTH);
@@ -52,20 +62,6 @@ public class CompareView extends JFrame {
         comparisonPanel.add(new JScrollPane(vehicleADescArea));
         comparisonPanel.add(new JScrollPane(vehicleBDescArea));
         add(comparisonPanel, BorderLayout.CENTER);
-
-        // Reselect Button
-        JButton reselectButton = new JButton("Reselect Vehicle");
-        reselectButton.addActionListener(e -> controller.reselectVehicleB());
-
-        JPanel button1Panel = new JPanel(new FlowLayout());
-        button1Panel.add(reselectButton);
-        button1Panel.add(analyzeButton);
-
-        topPanel.add(button1Panel, BorderLayout.EAST);
-    }
-
-    public String getSearchFieldText() {
-        return searchField.getText();
     }
 
     private JTextArea createDescriptionArea(String title) {
@@ -102,5 +98,9 @@ public class CompareView extends JFrame {
         scrollPane.setPreferredSize(new Dimension(900, 400));
 
         JOptionPane.showMessageDialog(this, scrollPane, "Comparison Result", JOptionPane.PLAIN_MESSAGE);
+    }
+
+    public String getSearchFieldText() {
+        return searchField.getText();
     }
 }
