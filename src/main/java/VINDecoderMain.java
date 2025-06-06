@@ -282,7 +282,7 @@ public class VINDecoderMain {
         compare.addActionListener(e -> openCompareView(vehicle));
         menu.add(compare);
 
-        // Dynamic options based on saved status
+        // Check saved status directly from the vehicle object
         if (vehicle.getSaved()) {
             // Options for saved vehicles
             JMenuItem edit = new JMenuItem("Edit Nickname");
@@ -317,10 +317,14 @@ public class VINDecoderMain {
 
                 if (confirm == JOptionPane.YES_OPTION) {
                     try (Connection conn = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD)) {
-                        removeVehicle(vehicle, currentUserID);
-                        vehicle.setIsSaved(false);
-                        JOptionPane.showMessageDialog(mainView, "Vehicle removed from saved.");
-                        performSearch();
+                        if (removeVehicle(vehicle, currentUserID)) {
+                            vehicle.setIsSaved(false);
+                            JOptionPane.showMessageDialog(mainView, "Vehicle removed from saved.");
+                            performSearch();
+                        } else {
+                            JOptionPane.showMessageDialog(mainView, "Failed to remove vehicle.",
+                                    "Database Error", JOptionPane.ERROR_MESSAGE);
+                        }
                     } catch (SQLException ex) {
                         JOptionPane.showMessageDialog(mainView, "Error removing vehicle: " + ex.getMessage(),
                                 "Database Error", JOptionPane.ERROR_MESSAGE);
@@ -345,24 +349,16 @@ public class VINDecoderMain {
                 }
 
                 try (Connection conn = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD)) {
-                    // Get user ID if not already set
-                    if (currentUserID == -1) {
-                        String sql = "SELECT userID FROM users WHERE userName = ?";
-                        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-                            stmt.setString(1, currentUser);
-                            ResultSet rs = stmt.executeQuery();
-                            if (rs.next()) {
-                                currentUserID = rs.getInt("userID");
-                            }
-                        }
-                    }
-
                     if (!vehicleExistsInDB(vehicle.getVIN(), currentUserID)) {
                         Vehicle vehicleToSave = solidifyVehicle(vehicle);
                         vehicleToSave.setIsSaved(true);
-                        saveVehicle(vehicleToSave, currentUserID);
-                        JOptionPane.showMessageDialog(mainView, "Vehicle saved successfully!");
-                        performSearch();
+                        boolean saved = saveVehicle(vehicleToSave, currentUserID);
+                        if (saved) {
+                            JOptionPane.showMessageDialog(mainView, "Vehicle saved successfully!");
+                            performSearch();
+                        } else {
+                            JOptionPane.showMessageDialog(mainView, "Failed to save vehicle.");
+                        }
                     } else {
                         JOptionPane.showMessageDialog(mainView,
                                 "This vehicle is already in your saved vehicles.");
@@ -697,6 +693,39 @@ public class VINDecoderMain {
 
 
     public Vehicle solidifyVehicle(Vehicle tempVehicle) {
+        // First check if the vehicle is saved in the database
+        boolean isSaved = false;
+        String nickname = tempVehicle.getNickname();
+
+        if (currentUserID != -1) {
+            try (Connection conn = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD)) {
+                // Check saved_vehicles table first
+                String savedSql = "SELECT COUNT(*) FROM saved_vehicles WHERE vin_number = ? AND user_id = ?";
+                try (PreparedStatement savedStmt = conn.prepareStatement(savedSql)) {
+                    savedStmt.setString(1, tempVehicle.getVIN());
+                    savedStmt.setInt(2, currentUserID);
+                    ResultSet rs = savedStmt.executeQuery();
+                    if (rs.next()) {
+                        isSaved = rs.getInt(1) > 0;
+                    }
+                }
+
+                // If saved, get the nickname from vehicles table
+                if (isSaved) {
+                    String nicknameSql = "SELECT nickname FROM vehicles WHERE VIN_NUMBER = ? AND userID = ?";
+                    try (PreparedStatement nicknameStmt = conn.prepareStatement(nicknameSql)) {
+                        nicknameStmt.setString(1, tempVehicle.getVIN());
+                        nicknameStmt.setInt(2, currentUserID);
+                        ResultSet rs = nicknameStmt.executeQuery();
+                        if (rs.next()) {
+                            nickname = rs.getString("nickname");
+                        }
+                    }
+                }
+            } catch (SQLException e) {
+                System.out.println("Error checking saved status: " + e.getMessage());
+            }
+        }
 
         String vin = tempVehicle.getVIN();
         String apiUrl = "https://vpic.nhtsa.dot.gov/api/vehicles/DecodeVin/" + vin + "?format=json";
@@ -735,110 +764,164 @@ public class VINDecoderMain {
             String plantCountry = getValue(results, "Plant Country");
             String manufacturer = getValue(results, "Manufacturer");
             String gvwr = getValue(results, "GVWR");
-            int seatRows = parseInt(getValue(results, "Number of Seat Rows")); // Substitute if needed
+            int seatRows = parseInt(getValue(results, "Number of Seat Rows"));
             int seats = parseInt(getValue(results, "Seats"));
             System.out.println(results.toString(2));
 
+            Vehicle permVehicle = new Vehicle(
+                    vin,
+                    nickname,
+                    tempVehicle.getMake(),
+                    tempVehicle.getModel(),
+                    tempVehicle.getYear(),
+                    isSaved,
+                    trim,
+                    vehicleType,
+                    bodyClass,
+                    doors,
+                    fuelTypePrimary,
+                    driveType,
+                    engineModel,
+                    engineCylinders,
+                    displacement,
+                    transmissionStyle,
+                    transmissionSpeeds,
+                    plantCountry,
+                    manufacturer,
+                    gvwr,
+                    seatRows,
+                    seats
+            );
 
-
-            Vehicle permVehicle = new Vehicle(tempVehicle.getVIN(), tempVehicle.getNickname(), tempVehicle.getMake(),
-                    tempVehicle.getModel(), tempVehicle.getYear(), false, trim, vehicleType, bodyClass, doors, fuelTypePrimary,
-                    driveType, engineModel, engineCylinders, displacement, transmissionStyle, transmissionSpeeds, plantCountry,
-                    manufacturer, gvwr, seatRows,
-                    seats);
             System.out.println(permVehicle.fullDescription());
             return permVehicle;
 
         } catch (Exception e) {
             System.err.println("Failed to retrieve data from NHTSA: " + e.getMessage());
             e.printStackTrace();
-            return tempVehicle; // Fallback to original
+
+            // Return a vehicle with at least the basic info we have
+            Vehicle fallbackVehicle = new Vehicle(
+                    vin,
+                    nickname,
+                    tempVehicle.getMake(),
+                    tempVehicle.getModel(),
+                    tempVehicle.getYear(),
+                    isSaved
+            );
+            return fallbackVehicle;
         }
     }
 
-
-
     // TODO (+HOLDEN) (+SAUL): WRITE LOGIC TO SAVE VEHICLE OBJECT TO MYSQL
-    public void saveVehicle(Vehicle vehicle, int userId) {
-
+    public boolean saveVehicle(Vehicle vehicle, int userId) {
         String insertSql = "INSERT INTO vehicles (VIN_NUMBER, userID, nickname, V_make, V_model, V_year, trim, vehicleType, bodyClass, doors, fuelTypePrimary, driveType, engineModel, engineCylinders, displacementL, transmissionStyle, transmissionSpeed, plantCountry, manufacturer, GVWR, seatRows, seats) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD);
-             PreparedStatement stmt = conn.prepareStatement(insertSql)) {
+        String insertSavedSql = "INSERT INTO saved_vehicles (user_id, vin_number) VALUES (?, ?)";
 
-            stmt.setString(1, vehicle.getVIN());
-            stmt.setInt(2, userId);
-            stmt.setString(3, vehicle.getNickname());
-            stmt.setString(4, vehicle.getMake());
-            stmt.setString(5, vehicle.getModel());
-            stmt.setInt(6, vehicle.getYear());
-            stmt.setString(7, vehicle.getTrim());
-            stmt.setString(8, vehicle.getVehicleType());
-            stmt.setString(9, vehicle.getBodyClass());
-            stmt.setInt(10, vehicle.getDoors());
-            stmt.setString(11, vehicle.getFuelTypePrimary());
-            stmt.setString(12, vehicle.getDriveType());
-            stmt.setString(13, vehicle.getEngineModel());
-            stmt.setInt(14, vehicle.getEngineCylinder());
-            stmt.setDouble(15, vehicle.getDisplacementL());
-            stmt.setString(16, vehicle.getTransmissionStyle());
-            stmt.setInt(17, vehicle.getTransmissionSpeed());
-            stmt.setString(18, vehicle.getPlantCountry());
-            stmt.setString(19, vehicle.getManufacturer());
-            stmt.setString(20, vehicle.getGvwr());
-            stmt.setInt(21, vehicle.getSeatRows());
-            stmt.setInt(22, vehicle.getSeats());
+        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD)) {
+            // Start transaction
+            conn.setAutoCommit(false);
 
-            int rowsInserted = stmt.executeUpdate();
-            if (rowsInserted > 0) {
-                System.out.println("Vehicle saved successfully.");
-            } else {
-                System.out.println("Vehicle save failed.");
+            try (PreparedStatement stmt = conn.prepareStatement(insertSql);
+                 PreparedStatement savedStmt = conn.prepareStatement(insertSavedSql)) {
+
+                // Insert vehicle details
+                stmt.setString(1, vehicle.getVIN());
+                stmt.setInt(2, userId);
+                stmt.setString(3, vehicle.getNickname());
+                stmt.setString(4, vehicle.getMake());
+                stmt.setString(5, vehicle.getModel());
+                stmt.setInt(6, vehicle.getYear());
+                stmt.setString(7, vehicle.getTrim());
+                stmt.setString(8, vehicle.getVehicleType());
+                stmt.setString(9, vehicle.getBodyClass());
+                stmt.setInt(10, vehicle.getDoors());
+                stmt.setString(11, vehicle.getFuelTypePrimary());
+                stmt.setString(12, vehicle.getDriveType());
+                stmt.setString(13, vehicle.getEngineModel());
+                stmt.setInt(14, vehicle.getEngineCylinder());
+                stmt.setDouble(15, vehicle.getDisplacementL());
+                stmt.setString(16, vehicle.getTransmissionStyle());
+                stmt.setInt(17, vehicle.getTransmissionSpeed());
+                stmt.setString(18, vehicle.getPlantCountry());
+                stmt.setString(19, vehicle.getManufacturer());
+                stmt.setString(20, vehicle.getGvwr());
+                stmt.setInt(21, vehicle.getSeatRows());
+                stmt.setInt(22, vehicle.getSeats());
+
+                int rowsInserted = stmt.executeUpdate();
+
+                // Only proceed if vehicle was saved successfully
+                if (rowsInserted > 0) {
+                    // Add to saved_vehicles table
+                    savedStmt.setInt(1, userId);
+                    savedStmt.setString(2, vehicle.getVIN());
+                    int savedRows = savedStmt.executeUpdate();
+
+                    conn.commit();
+                    return savedRows > 0; // Return true if both inserts succeeded
+                } else {
+                    conn.rollback();
+                    return false;
+                }
+
+            } catch (SQLException e) {
+                conn.rollback();
+                System.out.println("Error saving vehicle: " + e.getMessage());
+                return false;
+            } finally {
+                conn.setAutoCommit(true);
             }
-
         } catch (SQLException e) {
-            System.out.println("SQL error while saving vehicle:");
-            e.printStackTrace();
+            System.out.println("Database connection error: " + e.getMessage());
+            return false;
         }
     }
 
-
-
     // TODO (+HOLDEN) (+SAUL): WRITE LOGIC TO REMOVE VEHICLE OBJECT FROM MYSQL
-    public void removeVehicle(Vehicle vehicle, int userId) {
+    public boolean removeVehicle(Vehicle vehicle, int userId) {
+        String deleteSavedSql = "DELETE FROM saved_vehicles WHERE vin_number = ? AND user_id = ?";
+        String deleteVehicleSql = "DELETE FROM vehicles WHERE VIN_NUMBER = ? AND userID = ?";
 
-        String deleteSql = "DELETE FROM vehicles WHERE VIN_NUMBER = ? AND userID = ?";
+        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD)) {
+            conn.setAutoCommit(false);
 
-        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD);
-             PreparedStatement stmt = conn.prepareStatement(deleteSql)) {
+            try (PreparedStatement savedStmt = conn.prepareStatement(deleteSavedSql);
+                 PreparedStatement vehicleStmt = conn.prepareStatement(deleteVehicleSql)) {
 
-            stmt.setString(1, vehicle.getVIN());
-            stmt.setInt(2, userId);
+                // First remove from saved_vehicles
+                savedStmt.setString(1, vehicle.getVIN());
+                savedStmt.setInt(2, userId);
+                int savedRows = savedStmt.executeUpdate();
 
-            int rowsDeleted = stmt.executeUpdate();
+                // Then remove from vehicles
+                vehicleStmt.setString(1, vehicle.getVIN());
+                vehicleStmt.setInt(2, userId);
+                vehicleStmt.executeUpdate();
 
-            if (rowsDeleted > 0) {
-                System.out.println("Vehicle removed successfully.");
-            } else {
-                System.out.println("No matching vehicle found to delete.");
+                conn.commit();
+                return savedRows > 0;
+
+            } catch (SQLException e) {
+                conn.rollback();
+                throw e;
+            } finally {
+                conn.setAutoCommit(true);
             }
-
         } catch (SQLException e) {
             System.out.println("SQL error while removing vehicle:");
             e.printStackTrace();
+            return false;
         }
     }
-
-
 
     // TODO (+HOLDEN): WRITE GUI LOGIC TO OPEN A TEXT BOX AND TAKE USER INPUT FROM A RESULTING PROMPT BOX
     public void editName(Vehicle vehicle) {
         String newName = "new name";
         vehicle.setNickname(newName);
     }
-
-
 
     public static void main(String[] args) {
         VINDecoderMain decoder = new VINDecoderMain();
