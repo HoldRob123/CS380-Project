@@ -1,3 +1,5 @@
+
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
@@ -11,6 +13,7 @@ public class VINDecoderCompare {
     private Vehicle vehicleA;
     private Vehicle vehicleB;
     private CompareView compareView;
+    private VehicleLibrary library = new VehicleLibrary();
     private final VINDecoderMain mainApp;
 
     public VINDecoderCompare(VINDecoderMain mainApp) {
@@ -18,6 +21,7 @@ public class VINDecoderCompare {
     }
 
     public void run(Vehicle vehicleA) {
+        vehicleA = mainApp.solidifyVehicle(vehicleA);
         this.vehicleA = vehicleA;
         this.compareView = new CompareView(this);
         compareView.displayVehicleA(vehicleA);
@@ -53,14 +57,6 @@ public class VINDecoderCompare {
         }
     }
 
-    private boolean matchesSearchCriteria(Vehicle vehicle, String query) {
-        String q = query.toLowerCase();
-        return vehicle.getVIN().toLowerCase().contains(q)
-                || vehicle.getMake().toLowerCase().contains(q)
-                || vehicle.getModel().toLowerCase().contains(q)
-                || String.valueOf(vehicle.getYear()).contains(q)
-                || (vehicle.getNickname() != null && vehicle.getNickname().toLowerCase().contains(q));
-    }
 
     private Vehicle selectVehicleFromResults(List<Vehicle> vehicles) {
         String[] options = vehicles.stream()
@@ -84,6 +80,8 @@ public class VINDecoderCompare {
     }
 
     public void setVehicleB(Vehicle vehicleB) {
+        // Grab full information from Vehicle B
+        vehicleB = mainApp.solidifyVehicle(vehicleB);
         this.vehicleB = vehicleB;
         compareView.displayVehicleB(vehicleB);
     }
@@ -101,9 +99,55 @@ public class VINDecoderCompare {
 
     private String generateComparisonResult() {
         StringBuilder result = new StringBuilder();
-        result.append(String.format("%-30s | %-30s | %-30s%n", "Attribute", "Vehicle A", "Vehicle B"));
-        result.append("-".repeat(95)).append("\n");
 
+        // General Description of the Vehicle if Provided in Library
+        String genA = library.getGeneralWrittenExplaination(vehicleA.getMake(), vehicleA.getModel());
+        String genB = library.getGeneralWrittenExplaination(vehicleB.getMake(), vehicleB.getModel());
+
+        if(!genA.isEmpty()) {
+            result.append(genA);
+            result.append("\n");
+        }
+        if(!genB.isEmpty()) {
+            result.append(genB);
+            result.append("\n");
+        }
+
+        // Value Comparisons
+        // Age
+        String yrComp = vehicleA.getYear() >= vehicleB.getYear() ? "younger" : "older";
+        int yrDiff = Math.abs(vehicleA.getYear() - vehicleB.getYear());
+        result.append("The " + vehicleA.getMake() + " " + vehicleA.getModel() + " is " + yrDiff + " years " + yrComp +
+                " than the " + vehicleB.getMake() + " " +vehicleB.getYear() + "!\n");
+
+        //Weight
+        if(!vehicleA.getGvwr().equals("") && !vehicleB.getGvwr().equals("")) {
+            int aLowGvwr = extractLowerBound(vehicleA.getGvwr());
+            int bLowGvwr = extractLowerBound(vehicleB.getGvwr());
+            String weComp = aLowGvwr > bLowGvwr ? "heavier" : "lighter";
+            int weDiff = Math.abs(aLowGvwr - bLowGvwr);
+            result.append("The " + vehicleA.getMake() + " " + vehicleA.getModel() + " is " + weDiff + " pounds " + weComp +
+                    " than the " + vehicleB.getMake() + " " + vehicleB.getYear() + "!\n");
+        }
+
+        //Body Class
+        if(vehicleA.getBodyClass() != null && vehicleB.getBodyClass() != null) {
+            if(!vehicleA.getBodyClass().equals(vehicleB.getBodyClass())) {
+                result.append("The " + vehicleA.getMake() + " " + vehicleA.getModel() + " has " + vehicleA.getBodyClass() + " whereas the "
+                        + vehicleB.getMake() + " " + vehicleB.getYear() + " has " + vehicleB.getBodyClass() + "\n");
+            }
+        }
+
+        // Displacement
+        if(vehicleA.getDisplacementL() != 0.0 && vehicleB.getDisplacementL() != 0.0) {
+            String disComp = vehicleA.getDisplacementL() >= vehicleB.getDisplacementL() ? "higher" : "lower";
+            double disDiff = Math.abs(vehicleA.getDisplacementL() - vehicleB.getDisplacementL());
+            result.append("The " + vehicleA.getMake() + " " + vehicleA.getModel() + " has " + disDiff + "L " + disComp +
+                    " displacement than the " + vehicleB.getMake() + " " + vehicleB.getYear() + "!\n\n");
+        }
+
+        result.append(String.format("%-60s | %-60s | %-60s%n", "Attribute", "Vehicle A", "Vehicle B"));
+        result.append("-".repeat(200)).append("\n");
         compareAttribute(result, "VIN", vehicleA.getVIN(), vehicleB.getVIN());
         compareAttribute(result, "Nickname",
                 vehicleA.getNickname() != null ? vehicleA.getNickname() : "N/A",
@@ -131,9 +175,10 @@ public class VINDecoderCompare {
         return result.toString();
     }
 
+    // Value comparison helper method
     private void compareAttribute(StringBuilder result, String attribute, String valueA, String valueB) {
         String highlight = valueA.equals(valueB) ? "" : "*";
-        result.append(String.format("%-30s | %-30s | %-30s%n",
+        result.append(String.format("%-60s | %-60s | %-60s%n",
                 highlight + attribute + highlight,
                 highlight + (valueA != null ? valueA : "N/A") + highlight,
                 highlight + (valueB != null ? valueB : "N/A") + highlight));
@@ -157,4 +202,26 @@ public class VINDecoderCompare {
                     "Search Needed", JOptionPane.INFORMATION_MESSAGE);
         }
     }
+
+    private int extractLowerBound(String gvwr) {
+        // Example input: "Class 2: 6,001 - 10,000 lb"
+        if (gvwr == null || gvwr.isEmpty()) return Integer.MIN_VALUE;
+
+        try {
+            // Extract digits after the colon
+            String[] parts = gvwr.split(":");
+            if (parts.length < 2) return Integer.MIN_VALUE;
+
+            // Find the lower bound number in the range string
+            String rangePart = parts[1].trim(); // e.g. "6,001 - 10,000 lb"
+            String numberOnly = rangePart.split("-")[0].replaceAll("[^\\d]", "");
+            return Integer.parseInt(numberOnly);
+        } catch (Exception e) {
+            // Fallback if anything goes wrong
+            return Integer.MIN_VALUE;
+        }
+    }
+
+
+
 }

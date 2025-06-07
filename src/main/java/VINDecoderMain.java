@@ -11,11 +11,9 @@
 
 import org.json.JSONObject;
 import org.json.JSONArray;
-import org.json.JSONObject;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URI;
@@ -27,7 +25,6 @@ import java.net.http.HttpResponse;
 import java.sql.*;
 import java.util.*;
 import java.util.List;
-import java.util.stream.Collectors;
 
 
 public class VINDecoderMain {
@@ -50,22 +47,23 @@ public class VINDecoderMain {
     private LoginScreen loginScreen;
     private CompareView compareView;
     public MainView mainView;
+    private VehicleLibrary vehicleLibrary = new VehicleLibrary();
 
     // Facilitator method for main screen
     public void run() {
         // Loads Vehicle Cache
-//        URL url = getClass().getClassLoader().getResource("/textfiles/vinresults.txt");
+//        URL url = getClass().getClassLoader().getResource("vinresults.txt");
 //        System.out.println("Resource URL: " + url);
 //
 //
-//        InputStream input = getClass().getClassLoader().getResourceAsStream("/textfiles/vinresults.txt");
+//        InputStream input = getClass().getClassLoader().getResourceAsStream("vinresults.txt");
 //        if (input == null) {
 //            System.err.println("File not found!");
 //            return;
 //        }
 
-        String input = "C:\\Users\\isaka\\OneDrive\\Documents\\GitHub\\CS380-Project\\src\\main\\resources\\textfiles\\vinresults.txt";
-        loadCachedVehicles(input);
+        String input = "C:\\Users\\isaka\\OneDrive\\Documents\\GitHub\\cs380project\\src\\main\\resources\\vinresults.txt";
+        loadCachedVehicles(input.toString());
 
         // Launches Login Page
         SwingUtilities.invokeLater(() -> {
@@ -251,8 +249,6 @@ public class VINDecoderMain {
             info.setLayout(new BoxLayout(info, BoxLayout.Y_AXIS));
             if (v.getSaved()) {
                 info.add(new JLabel("Nickname:" + v.getNickname()));
-            } else {
-                info.add(new JLabel("VIN:" + v.getVIN()));
             }
             info.add(new JLabel("Model:" + v.getModel()));
             info.add(new JLabel("Make:" + v.getMake()));
@@ -506,37 +502,50 @@ public class VINDecoderMain {
     }
 
 
-    // Apply filters on the collection of precached vehicles
+    // This method filters cached vehicles based on criteria from the provided filterList map.
     public ArrayList<Vehicle> filterCachedVINS(Map<String, String> filterList) {
+
+        // Initialize an empty list to store vehicles that match the filter criteria
         ArrayList<Vehicle> results = new ArrayList<>();
 
+        // Loop through each vehicle in the cached list
         for (Vehicle v : cacheVehicles) {
+            // Assume the vehicle matches the filters unless proven otherwise
             boolean matches = true;
 
+            // Check if the filter contains a "make" key and if the vehicle's make contains the filter value (case-insensitive)
             if (filterList.containsKey("make") && !v.getMake().toLowerCase().contains(filterList.get("make").toLowerCase())) {
                 matches = false;
             }
+
+            // Check if the filter contains a "model" key and if the vehicle's model contains the filter value (case-insensitive)
             if (filterList.containsKey("model") && !v.getModel().toLowerCase().contains(filterList.get("model").toLowerCase())) {
                 matches = false;
             }
+
+            // Check if the filter contains a "year" key
             if (filterList.containsKey("year")) {
                 try {
+                    // Parse the year value from the filter and compare it to the vehicle's year
                     int yearFilter = Integer.parseInt(filterList.get("year"));
                     if (v.getYear() != yearFilter) {
                         matches = false;
                     }
                 } catch (NumberFormatException e) {
-                    matches = false;
+                    vehicleLibrary.getRealisticYear(v.getMake());
                 }
             }
 
+            // If the vehicle matches all specified filters, add it to the results list
             if (matches) {
                 results.add(v);
             }
         }
 
+        // Return the filtered list of vehicles
         return results;
     }
+
 
 
 
@@ -676,8 +685,7 @@ public class VINDecoderMain {
             JSONObject json = new JSONObject(content.toString());
             JSONArray resultsArray = json.getJSONArray("Results");
 
-            // Random Year if none is specified
-            int year = sYear.isEmpty() ? yr.nextInt(2025-1990+1) + 1990 : Integer.parseInt(sYear);
+            VehicleLibrary vehicleLibrary = new VehicleLibrary();
 
             for (int i = 0; i < resultsArray.length(); i++) {
                 JSONObject obj = resultsArray.getJSONObject(i);
@@ -687,7 +695,8 @@ public class VINDecoderMain {
                 if (!model.isEmpty() && !nhtsaModel.toLowerCase().contains(model.toLowerCase())) {
                     continue;
                 }
-
+                // Gets a realistic year if none is specified
+                int year = sYear.isEmpty() ? vehicleLibrary.getRealisticYear(nhtsaMake) : Integer.parseInt(sYear);
                 Vehicle temp = new Vehicle("<VIN UNKNOWN>", "N/A", nhtsaMake, nhtsaModel, year, false);
                 temp.setIsSaved(false);
                 results.add(temp);
@@ -705,8 +714,10 @@ public class VINDecoderMain {
 
 
 
+
     public Vehicle solidifyVehicle(Vehicle tempVehicle) {
 
+        // Use VIN in search
         String vin = tempVehicle.getVIN();
         String apiUrl = "https://vpic.nhtsa.dot.gov/api/vehicles/DecodeVin/" + vin + "?format=json";
 
@@ -743,19 +754,17 @@ public class VINDecoderMain {
             int transmissionSpeeds = parseInt(getValue(results, "Transmission Speeds"));
             String plantCountry = getValue(results, "Plant Country");
             String manufacturer = getValue(results, "Manufacturer");
-            String gvwr = getValue(results, "GVWR");
+            String gvwr = getValue(results, "GVWR (Gross Vehicle Weight Rating)");
             int seatRows = parseInt(getValue(results, "Number of Seat Rows")); // Substitute if needed
             int seats = parseInt(getValue(results, "Seats"));
-            System.out.println(results.toString(2));
-
-
+            //System.out.println(results.toString(2));
 
             Vehicle permVehicle = new Vehicle(tempVehicle.getVIN(), tempVehicle.getNickname(), tempVehicle.getMake(),
                     tempVehicle.getModel(), tempVehicle.getYear(), false, trim, vehicleType, bodyClass, doors, fuelTypePrimary,
                     driveType, engineModel, engineCylinders, displacement, transmissionStyle, transmissionSpeeds, plantCountry,
                     manufacturer, gvwr, seatRows,
                     seats);
-            System.out.println(permVehicle.fullDescription());
+            //System.out.println(permVehicle.fullDescription());
             return permVehicle;
 
         } catch (Exception e) {

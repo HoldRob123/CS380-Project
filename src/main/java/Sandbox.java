@@ -1,3 +1,4 @@
+
 import java.io.*;
 import java.util.ArrayList;
 
@@ -6,8 +7,8 @@ public class Sandbox {
 
     public static void main(String[] args) {
         VINDecoderMain mainSystem = new VINDecoderMain();
-        String inputFile = "C:\\Users\\isaka\\OneDrive\\Documents\\GitHub\\cs380project\\src\\main\\java\\textfiles\\vins.txt";
-        String outputFile = "vinresults.txt";
+        String inputFile = "C:\\Users\\isaka\\OneDrive\\Documents\\GitHub\\cs380project\\src\\main\\resources\\vins.txt";
+        String outputFile = "C:\\Users\\isaka\\OneDrive\\Documents\\GitHub\\cs380project\\src\\main\\resources\\vinresults.txt";
 
         try (BufferedReader br = new BufferedReader(new FileReader(inputFile));
              BufferedWriter bw = new BufferedWriter(new FileWriter(outputFile))) {

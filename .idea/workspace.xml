@@ -5,22 +5,26 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="88dd8be3-de38-498f-b64f-c57ba0bfd690" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/src/main/java/VehicleLibrary.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FINAL_POGGUSSY.iml" beforeDir="false" afterPath="$PROJECT_DIR$/FINAL_POGGUSSY.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/VINDecoderMain.java" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/CompareView.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/CompareView.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/LoginScreen.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/LoginScreen.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/MainView.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/MainView.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/Sandbox.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Sandbox.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/VINDecoderCompare.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/VINDecoderCompare.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/VINDecoderMain.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/VINDecoderMain.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/textfiles/vinresults.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/textfiles/vinresults.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/textfiles/vins.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/textfiles/vins.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/.idea/workspace.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/CompareView.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/LoginScreen.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/MainView.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/Sandbox.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/VINDecoderMain$1.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/VINDecoderMain.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/Vehicle.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/Vehicle.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Vehicle.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/textfiles/vinresults.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/vinresults.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/textfiles/vins.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/vins.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/CompareView.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/CompareView.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/MainView.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/MainView.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/Sandbox.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/Sandbox.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/VINDecoderCompare$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/VINDecoderCompare$1.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/VINDecoderCompare.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/VINDecoderCompare.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/VINDecoderMain.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/VINDecoderMain.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/Vehicle.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/Vehicle.class" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -72,20 +76,30 @@
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
+    "project.structure.last.edited": "Modules",
+    "project.structure.proportion": "0.15",
+    "project.structure.side.proportion": "0.2",
     "settings.editor.selected.configurable": "preferences.pluginManager",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\isaka\OneDrive\Documents\GitHub\cs380project\src\main\resources" />
       <recent name="C:\Users\isaka\OneDrive\Documents\GitHub\CS380-Project" />
       <recent name="C:\Users\isaka\OneDrive\Documents\GitHub\CS380-Project\src\main" />
       <recent name="C:\Users\isaka\OneDrive\Documents\GitHub\CS380-Project\src\main\resources" />
       <recent name="C:\Users\isaka\OneDrive\Documents\GitHub\cs380project\src\main\java\textfiles" />
-      <recent name="C:\Users\isaka\OneDrive\Documents\GitHub\cs380project\src\main\java" />
     </key>
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="Application.VINDecoderMain">
+    <configuration name="Sandbox" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="Sandbox" />
+      <module name="FINAL_POGGUSSY" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="VINDecoderMain" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="VINDecoderMain" />
       <module name="FINAL_POGGUSSY" />
@@ -96,8 +110,17 @@
     <recent_temporary>
       <list>
         <item itemvalue="Application.VINDecoderMain" />
+        <item itemvalue="Application.Sandbox" />
       </list>
     </recent_temporary>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-jdk-9f38398b9061-18abd8497189-intellij.indexing.shared.core-IU-241.14494.240" />
+        <option value="bundled-js-predefined-1d06a55b98c1-74d2a5396914-JavaScript-IU-241.14494.240" />
+      </set>
+    </attachedChunks>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
@@ -109,6 +132,10 @@
       <updated>1748981404458</updated>
       <workItem from="1749083157565" duration="39000" />
       <workItem from="1749083257541" duration="19248000" />
+      <workItem from="1749241757588" duration="157000" />
+      <workItem from="1749241937193" duration="1383000" />
+      <workItem from="1749243355420" duration="249000" />
+      <workItem from="1749243625544" duration="16119000" />
     </task>
     <servers />
   </component>
