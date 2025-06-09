@@ -1,11 +1,9 @@
-
-
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.util.*;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 // TODO: TRANSFER FROM FAKE VEHICLES TO REAL VEHICLES
@@ -35,28 +33,6 @@ public class VINDecoderCompare {
             }
         });
     }
-
-    public void handleSearch(String query) {
-        if (query == null || query.trim().isEmpty()) {
-            compareView.showMessage("Please enter a search term", "Search Error", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
-        // Use mainApp's confirmSearch to get real vehicles
-        List<Vehicle> results = mainApp.confirmSearch(query).stream()
-                .filter(v -> !v.getVIN().equals(vehicleA.getVIN())) // Exclude vehicleA
-                .collect(Collectors.toList());
-
-        if (results.isEmpty()) {
-            compareView.showMessage("No matching vehicles found", "No Results", JOptionPane.INFORMATION_MESSAGE);
-        } else {
-            Vehicle selected = selectVehicleFromResults(results);
-            if (selected != null) {
-                setVehicleB(selected);
-            }
-        }
-    }
-
 
     private Vehicle selectVehicleFromResults(List<Vehicle> vehicles) {
         String[] options = vehicles.stream()
@@ -134,7 +110,7 @@ public class VINDecoderCompare {
         if(vehicleA.getBodyClass() != null && vehicleB.getBodyClass() != null) {
             if(!vehicleA.getBodyClass().equals(vehicleB.getBodyClass())) {
                 result.append("The " + vehicleA.getMake() + " " + vehicleA.getModel() + " has " + vehicleA.getBodyClass() + " whereas the "
-                        + vehicleB.getMake() + " " + vehicleB.getYear() + " has " + vehicleB.getBodyClass() + "\n");
+                        + vehicleB.getMake() + " " + vehicleB.getYear() + " has " + vehicleB.getBodyClass() + "!\n");
             }
         }
 
@@ -145,6 +121,15 @@ public class VINDecoderCompare {
             result.append("The " + vehicleA.getMake() + " " + vehicleA.getModel() + " has " + disDiff + "L " + disComp +
                     " displacement than the " + vehicleB.getMake() + " " + vehicleB.getYear() + "!\n\n");
         }
+
+        //Drive Type
+        if(vehicleA.getDriveType() != null && vehicleB.getDriveType() != null) {
+            if(!vehicleA.getDriveType().equals(vehicleB.getDriveType())) {
+                result.append("The " + vehicleA.getMake() + " " + vehicleA.getModel() + " has " + vehicleA.getDriveType() + " whereas the "
+                        + vehicleB.getMake() + " " + vehicleB.getYear() + " has " + vehicleB.getDriveType() + "!\n");
+            }
+        }
+
 
         result.append(String.format("%-60s | %-60s | %-60s%n", "Attribute", "Vehicle A", "Vehicle B"));
         result.append("-".repeat(200)).append("\n");
@@ -191,18 +176,6 @@ public class VINDecoderCompare {
         mainApp.getMainView().setVisible(true);
     }
 
-    public void reselectVehicleB() {
-        if (vehicleA == null) return;
-
-        String currentSearch = compareView.getSearchFieldText();
-        if (currentSearch != null && !currentSearch.isEmpty()) {
-            handleSearch(currentSearch);
-        } else {
-            compareView.showMessage("Please enter a search term first",
-                    "Search Needed", JOptionPane.INFORMATION_MESSAGE);
-        }
-    }
-
     private int extractLowerBound(String gvwr) {
         // Example input: "Class 2: 6,001 - 10,000 lb"
         if (gvwr == null || gvwr.isEmpty()) return Integer.MIN_VALUE;
@@ -222,6 +195,52 @@ public class VINDecoderCompare {
         }
     }
 
+    public void handleSearch(String query, Map<String, String> filters) {
+        String lowerQuery = query.toLowerCase();
 
+        List<Vehicle> results = mainApp.confirmSearch(query).stream()
+                .filter(v -> !v.getVIN().equals(vehicleA.getVIN()))
+                .filter(v ->
+                        (v.getVIN() != null && v.getVIN().toLowerCase().contains(lowerQuery)) ||
+                                (v.getNickname() != null && v.getNickname().toLowerCase().contains(lowerQuery))
+                )
+                .collect(Collectors.toList());
+
+        results = applyFilters(results, filters);
+        showSearchResults(results);
+    }
+
+    public void handleFilterSearch(Map<String, String> filters) {
+        List<Vehicle> results = mainApp.confirmFilter(filters).stream()
+                .filter(v -> !v.getVIN().equals(vehicleA.getVIN()))
+                .collect(Collectors.toList());
+
+        showSearchResults(results);
+    }
+
+    private List<Vehicle> applyFilters(List<Vehicle> vehicles, Map<String, String> filters) {
+        return vehicles.stream()
+                .filter(v -> filters.get("year").isEmpty() ||
+                        String.valueOf(v.getYear()).contains(filters.get("year")))
+                .filter(v -> filters.get("make").isEmpty() ||
+                        v.getMake().toLowerCase().contains(filters.get("make").toLowerCase()))
+                .filter(v -> filters.get("model").isEmpty() ||
+                        v.getModel().toLowerCase().contains(filters.get("model").toLowerCase()))
+                .filter(v -> filters.get("fuel").isEmpty() ||
+                        (v.getFuelTypePrimary() != null &&
+                                v.getFuelTypePrimary().equalsIgnoreCase(filters.get("fuel"))))
+                .collect(Collectors.toList());
+    }
+
+    private void showSearchResults(List<Vehicle> results) {
+        if (results.isEmpty()) {
+            compareView.showMessage("No matching vehicles found", "No Results", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            Vehicle selected = selectVehicleFromResults(results);
+            if (selected != null) {
+                setVehicleB(selected);
+            }
+        }
+    }
 
 }

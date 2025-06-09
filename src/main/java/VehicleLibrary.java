@@ -175,33 +175,17 @@ The Best-Selling Cars, SUVs, and Trucks of 2024
 auto123.com
 The 25 best-selling vehicles in the U.S. in 2024 | Car News | Auto123
 
-auto123.com
-The 25 top-selling vehicles in 2024 in the U.S. | Car News | Auto123
-
 kbb.com
 The 25 Best-Selling Cars of 2024 So Far - Kelley Blue Book
-Home General The best-selling cars, trucks, and SUVs of 2024 are off to a strong start, with most segments seeing about a 7 percent uptick in sales compared to the first half of 2023, which likewise...
-
-motortrend.com
-The Best-Selling Cars, SUVs, and Trucks of 2024
 
 autoblog.com
 2024's best-selling cars: Who came out on top?
-
-auto123.com
-The 25 best-selling vehicles in the U.S. in 2024 | Car News | Auto123
-
-auto123.com
-The 25 top-selling vehicles in 2024 in the U.S. | Car News | Auto123
 
 americancarsandracing.com
 The 10 Best Selling Vehicles Of 2024 In The USA | American Cars And Racing
 
 marklines.com
 USA - Flash report, Automotive sales volume, 2024 - MarkLines Automotive Industry Portal
-
-diminishedvalueofgeorgia.com
-Top 10 Most Sold Cars in the US for 2024 (Full List) | DVGA
 
 webuyanycarusa.com
 Driven to Success: The Best-Selling Cars of 2024! - We Buy Any Car®

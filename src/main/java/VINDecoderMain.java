@@ -1,20 +1,12 @@
-/****************************************
- VIN DECODER - CS 380
- Isak Jacobson
- Saul Rodriguez-Tapia
- Holden Robinson
-
- Push Date: 6/4/25
- Push Number: 11
- Last Modified By: Isak
- *****************************************/
-
-import org.json.JSONObject;
 import org.json.JSONArray;
+import org.json.JSONObject;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
@@ -26,7 +18,6 @@ import java.sql.*;
 import java.util.*;
 import java.util.List;
 
-
 public class VINDecoderMain {
 
     // Database credentials
@@ -36,11 +27,10 @@ public class VINDecoderMain {
 
     // User Credentials
     public String currentUser = "";
-    public int currentUserID = -1;
+    public static int currentUserID = -1;
 
     // Vehicle Cache
     protected List<Vehicle> cacheVehicles = new ArrayList<>();
-    Random yr = new Random();
 
 
     // GUI References
@@ -49,21 +39,14 @@ public class VINDecoderMain {
     public MainView mainView;
     private VehicleLibrary vehicleLibrary = new VehicleLibrary();
 
-    // Facilitator method for main screen
-    public void run() {
-        // Loads Vehicle Cache
-//        URL url = getClass().getClassLoader().getResource("vinresults.txt");
-//        System.out.println("Resource URL: " + url);
-//
-//
-//        InputStream input = getClass().getClassLoader().getResourceAsStream("vinresults.txt");
-//        if (input == null) {
-//            System.err.println("File not found!");
-//            return;
-//        }
+    public MainView getMainView() {
+        return mainView;
+    }
 
-        String input = "C:\\Users\\isaka\\OneDrive\\Documents\\GitHub\\cs380project\\src\\main\\resources\\vinresults.txt";
-        loadCachedVehicles(input.toString());
+    // Starts VINDecoder Main
+    public void run() {
+        String input = "C:\\Users\\cwu\\Documents\\GitHub\\CS380-Project\\src\\main\\resources\\vinresults.txt";
+        loadCachedVehicles(input);
 
         // Launches Login Page
         SwingUtilities.invokeLater(() -> {
@@ -72,80 +55,75 @@ public class VINDecoderMain {
         });
     }
 
-    public void setMainView(MainView mainView) {
-        this.mainView = mainView;
-    }
-
-    public MainView getMainView() {
-        return mainView;
-    }
-
-    // logs in based on the credentials the user has entered
-    // TODO (+SAUL) TEST DATABASE WITH THIS METHOD!
+    // Logs in based on the credentials the user has entered
     public String tryLogin(String username, String password) {
+        // Input validation (redundant but safe)
+        if (username == null || username.trim().isEmpty() ||
+                password == null || password.isEmpty()) {
+            return "Username and password cannot be empty";
+        }
+
         String result;
-
         try (Connection conn = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD)) {
-
-            // First: check if username exists
-            String checkUserSql = "SELECT userPassword FROM users WHERE userName = ?";
+            // Check if username exists
+            String checkUserSql = "SELECT userID, userPassword FROM users WHERE userName = ?";
             try (PreparedStatement checkUserStmt = conn.prepareStatement(checkUserSql)) {
                 checkUserStmt.setString(1, username);
                 ResultSet rs = checkUserStmt.executeQuery();
 
                 if (rs.next()) {
-                    // Username exists: now check password
+                    // Verify password
                     String correctPassword = rs.getString("userPassword");
                     if (correctPassword.equals(password)) {
-                        currentUser = username;
+                        this.currentUser = username;
+                        currentUserID = rs.getInt("userID");
                         result = "Login Successful!";
                     } else {
-                        result = "Credentials are incorrect";
+                        result = "Incorrect password";
                     }
                 } else {
-                    // Username does not exist: create new user
-                    createUser(username, password);
-                    currentUser = username;
-                    result = "Account Created!";
+                    // Create new user
+                    if (createUser(username, password)) {
+                        this.currentUser = username;
+                        result = "Account Created!";
+                    } else {
+                        result = "Failed to create account";
+                    }
                 }
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            result = "Database Connection Failed:\n" + e.getMessage();
+            result = "Database error: " + e.getMessage();
         }
-
         return result;
     }
 
+    // Creates a new user row in the mySQL database
+    private boolean createUser(String username, String password) {
+        String insertSql = "INSERT INTO users (userName, userPassword) VALUES (?, ?)";
 
+        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD);
+             PreparedStatement insertStmt = conn.prepareStatement(insertSql, Statement.RETURN_GENERATED_KEYS)) {
 
-    // Helper method to tryLogin that will insert a new user entry in mySQL
-    private static void createUser(String username, String password) {
-        String checkSql = "SELECT COUNT(*) FROM users WHERE userName = ?";
-        String insertSql = "INSERT INTO users (username, password) VALUES (?, ?)";
+            insertStmt.setString(1, username);
+            insertStmt.setString(2, password);
+            int rows = insertStmt.executeUpdate();
 
-        try (Connection connect = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD)) {
-
-            // Insert new user
-            try (PreparedStatement insertStmt = connect.prepareStatement(insertSql)) {
-                insertStmt.setString(1, username);
-                insertStmt.setString(2, password);
-                int rows = insertStmt.executeUpdate();
-
-                if (rows > 0) {
-                    System.out.println("User added successfully!");
-                } else {
-                    System.out.println("Something went wrong. No user was added.");
+            if (rows > 0) {
+                try (ResultSet generatedKeys = insertStmt.getGeneratedKeys()) {
+                    if (generatedKeys.next()) {
+                        currentUserID = generatedKeys.getInt(1);
+                        return true;
+                    }
                 }
             }
-
+            return false;
         } catch (SQLException e) {
             System.out.println("Database error occurred:");
             e.printStackTrace();
+            return false;
         }
     }
-
-
 
     public void onLoginSuccess() {
         if (loginScreen != null) {
@@ -154,12 +132,9 @@ public class VINDecoderMain {
         }
         mainView = new MainView(this);
         mainView.setVisible(true);
-        performSearch();
     }
 
-
-
-    // Make some VINS available by filtering search
+    // Make some VINS available by filtering search upon launch
     public void loadCachedVehicles(String filePath) {
         try (BufferedReader br = new BufferedReader(new FileReader(filePath.toString()))) {
             String line;
@@ -207,8 +182,6 @@ public class VINDecoderMain {
         }
     }
 
-
-
     // Perform search & filtering and update GUI results panel
     public void performSearch() {
         if (mainView == null) return;
@@ -221,9 +194,14 @@ public class VINDecoderMain {
         filters.put("year", mainView.getYearBox().getText().trim());
         filters.put("make", mainView.getMakeBox().getText().trim());
         filters.put("model", mainView.getModelBox().getText().trim());
-        filters.put("country", mainView.getCountryBox().getText().trim());
-        filters.put("fuel", mainView.getGasType().getSelectedItem().toString());
 
+
+        if (mainView.getSavedOnly().isSelected()) {
+            filters.put("savedOnly", "true");
+            System.out.println(currentUserID);
+        }
+
+        System.out.println("Filter List: " + filters);
 
         JPanel resultPanel = mainView.getResultPanel();
         resultPanel.removeAll();
@@ -242,7 +220,7 @@ public class VINDecoderMain {
         // Step 3: Display results in GUI
         for (Vehicle v : results) {
             JPanel card = new JPanel(new BorderLayout());
-            card.setMaximumSize(new Dimension(Integer.MAX_VALUE, 100));
+            card.setMaximumSize(new Dimension(Integer.MAX_VALUE, 150));
             card.setBorder(BorderFactory.createLineBorder(Color.gray));
 
             JPanel info = new JPanel();
@@ -250,6 +228,8 @@ public class VINDecoderMain {
             if (v.getSaved()) {
                 info.add(new JLabel("Nickname:" + v.getNickname()));
             }
+
+
             info.add(new JLabel("Model:" + v.getModel()));
             info.add(new JLabel("Make:" + v.getMake()));
             info.add(new JLabel("Year:" + v.getYear()));
@@ -268,8 +248,6 @@ public class VINDecoderMain {
         resultPanel.repaint();
     }
 
-
-
     // Popup menu when clicking vehicle options "..." button
     private void showVehicleOptions(Vehicle vehicle, Component invoker) {
         JPopupMenu menu = new JPopupMenu();
@@ -287,8 +265,16 @@ public class VINDecoderMain {
         compare.addActionListener(e -> openCompareView(vehicle));
         menu.add(compare);
 
-        // Dynamic options based on saved status
-        if (vehicle.getSaved()) {
+        // Check if vehicle is saved in the database
+        boolean isSaved = false;
+        try {
+            isSaved = vehicleExistsInDB(vehicle.getVIN(), currentUserID);
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(mainView, "Error checking vehicle status: " + ex.getMessage(),
+                    "Database Error", JOptionPane.ERROR_MESSAGE);
+        }
+
+        if (isSaved) {
             // Options for saved vehicles
             JMenuItem edit = new JMenuItem("Edit Nickname");
             edit.addActionListener(e -> {
@@ -304,7 +290,7 @@ public class VINDecoderMain {
                             stmt.setInt(3, currentUserID);
                             stmt.executeUpdate();
                             JOptionPane.showMessageDialog(mainView, "Nickname updated successfully!");
-                            performSearch();
+
                         }
                     } catch (SQLException ex) {
                         JOptionPane.showMessageDialog(mainView, "Error updating nickname: " + ex.getMessage(),
@@ -321,27 +307,28 @@ public class VINDecoderMain {
                         "Confirm Removal", JOptionPane.YES_NO_OPTION);
 
                 if (confirm == JOptionPane.YES_OPTION) {
-                    try (Connection conn = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD)) {
-                        removeVehicle(vehicle, currentUserID);
+                    boolean removed = removeVehicle(vehicle, currentUserID);
+                    if (removed) {
                         vehicle.setIsSaved(false);
-                        JOptionPane.showMessageDialog(mainView, "Vehicle removed from saved.");
+                        JOptionPane.showMessageDialog(mainView, "Vehicle removed from saved");
                         performSearch();
-                    } catch (SQLException ex) {
-                        JOptionPane.showMessageDialog(mainView, "Error removing vehicle: " + ex.getMessage(),
+                    } else {
+                        JOptionPane.showMessageDialog(mainView, "Failed to remove vehicle.",
                                 "Database Error", JOptionPane.ERROR_MESSAGE);
                     }
                 }
             });
             menu.add(remove);
+
         } else {
             // Option for unsaved vehicles
             JMenuItem save = new JMenuItem("Save Vehicle");
             save.addActionListener(e -> {
                 String nickname = vehicle.getNickname();
-                if (nickname == null || nickname.isEmpty()) {
+                if (nickname.equals("N/A") || nickname.isEmpty()) {
                     nickname = JOptionPane.showInputDialog(mainView,
                             "Enter a nickname for this vehicle:");
-                    if (nickname == null || nickname.trim().isEmpty()) {
+                    if (nickname.equals("N/A") || nickname.trim().isEmpty()) {
                         JOptionPane.showMessageDialog(mainView,
                                 "Vehicle must have a nickname to be saved.");
                         return;
@@ -349,30 +336,16 @@ public class VINDecoderMain {
                     vehicle.setNickname(nickname.trim());
                 }
 
-                try (Connection conn = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD)) {
-                    // Get user ID if not already set
-                    if (currentUserID == -1) {
-                        String sql = "SELECT userID FROM users WHERE userName = ?";
-                        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-                            stmt.setString(1, currentUser);
-                            ResultSet rs = stmt.executeQuery();
-                            if (rs.next()) {
-                                currentUserID = rs.getInt("userID");
-                            }
-                        }
-                    }
-
-                    if (!vehicleExistsInDB(vehicle.getVIN(), currentUserID)) {
-                        Vehicle vehicleToSave = solidifyVehicle(vehicle);
-                        vehicleToSave.setIsSaved(true);
-                        saveVehicle(vehicleToSave, currentUserID);
+                try {
+                    Vehicle vehicleToSave = solidifyVehicle(vehicle);
+                    vehicleToSave.setIsSaved(true);
+                    boolean saved = saveVehicle(vehicleToSave, currentUserID);
+                    if (saved) {
                         JOptionPane.showMessageDialog(mainView, "Vehicle saved successfully!");
-                        performSearch();
                     } else {
-                        JOptionPane.showMessageDialog(mainView,
-                                "This vehicle is already in your saved vehicles.");
+                        JOptionPane.showMessageDialog(mainView, "Failed to save vehicle.");
                     }
-                } catch (SQLException ex) {
+                } catch (Exception ex) {
                     JOptionPane.showMessageDialog(mainView, "Error saving vehicle: " + ex.getMessage(),
                             "Database Error", JOptionPane.ERROR_MESSAGE);
                 }
@@ -395,31 +368,53 @@ public class VINDecoderMain {
         }
     }
 
-
-
     // Method to direct to CompareView GUI once "Compare Vehicle" is clicked
     public void openCompareView(Vehicle vehicle) {
         VINDecoderCompare compareApp = new VINDecoderCompare(this); // Pass the current instance
         compareApp.run(vehicle);
     }
 
-
-
-
-
-    // TODO (+HOLDEN) (+SAUL): WRITE LOGIC TO SEARCH NHTSA AND MYSQL WITH THE GIVEN IDENTIFIER AND RETURN A LIST OF TEMP VEHICLE OBJECTS
+    // Allows the user to search for a VIN or nickname
     public ArrayList<Vehicle> confirmSearch(String identifier) {
         ArrayList<Vehicle> vehicleList = new ArrayList<>();
 
-        if (identifier.length() != 17) {
-            System.out.println("Invalid VIN length. VIN must be exactly 17 characters.");
-            return vehicleList;
-        }
-
         try (Connection conn = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD)) {
 
-            // Try to find vehicle in MySQL
-            String sql = "SELECT VIN_NUMBER, nickname, V_make, V_model, V_year FROM vehicles WHERE VIN_NUMBER = ?";
+        String sql = "";
+
+        // If identifier is not a 17-char VIN, treat it as a search keyword
+        if (identifier.length() != 17) {
+            sql = """
+                SELECT VIN_NUMBER, nickname, V_make, V_model, V_year
+                FROM vehicles
+                WHERE V_make LIKE ? OR V_model LIKE ? OR nickname LIKE ?
+                """;
+
+            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+                String keyword = "%" + identifier + "%"; // partial match
+                stmt.setString(1, keyword);
+                stmt.setString(2, keyword);
+                stmt.setString(3, keyword);
+
+                ResultSet rs = stmt.executeQuery();
+
+                while (rs.next()) {
+                    Vehicle vehicle = new Vehicle(
+                            rs.getString("VIN_NUMBER"),
+                            rs.getString("nickname"),
+                            rs.getString("V_make"),
+                            rs.getString("V_model"),
+                            rs.getInt("V_year"),
+                            true
+                    );
+                    vehicleList.add(vehicle);
+                }
+            }
+            return vehicleList; // return matched name results
+        }
+
+            // Try to find VIN in MySQL
+            sql = "SELECT VIN_NUMBER, nickname, V_make, V_model, V_year FROM vehicles WHERE VIN_NUMBER = ?";
             try (PreparedStatement stmt = conn.prepareStatement(sql)) {
                 stmt.setString(1, identifier);
                 ResultSet rs = stmt.executeQuery();
@@ -479,9 +474,7 @@ public class VINDecoderMain {
         return vehicleList;
     }
 
-
-
-    // TODO (+HOLDEN) (+SAUL): WRITE LOGIC TO SEARCH FOR THE VEHICLE IN MYSQL AND NHTSA GIVEN AN ARRAY LIST OF ATTRIBUTES
+    // Facilitator class for all filtering means
     public ArrayList<Vehicle> confirmFilter(Map<String, String> filterList) {
         ArrayList<Vehicle> results = new ArrayList<>();
 
@@ -500,7 +493,6 @@ public class VINDecoderMain {
         results.addAll(merged);
         return results;
     }
-
 
     // This method filters cached vehicles based on criteria from the provided filterList map.
     public ArrayList<Vehicle> filterCachedVINS(Map<String, String> filterList) {
@@ -541,13 +533,9 @@ public class VINDecoderMain {
                 results.add(v);
             }
         }
-
         // Return the filtered list of vehicles
         return results;
     }
-
-
-
 
     // Helper Method that grabs vehicles in mySQL that match the filters applied by the user
     private ArrayList<Vehicle> getSavedFilteredVehicles(Map<String, String> filterList) {
@@ -559,6 +547,7 @@ public class VINDecoderMain {
 
             // If "savedOnly" is in the filter list, get the current user's ID
             if (filterList.containsKey("savedOnly")) {
+                System.out.println("Hello");
                 String userIdQuery = "SELECT userID FROM users WHERE userName = ?";
                 try (PreparedStatement userStmt = conn.prepareStatement(userIdQuery)) {
                     userStmt.setString(1, currentUser);
@@ -570,29 +559,28 @@ public class VINDecoderMain {
                         return results; // Return empty list
                     }
                 }
-
                 sql.append(" JOIN saved_vehicles sv ON v.VIN_NUMBER = sv.vin_number");
                 sql.append(" JOIN users u ON sv.user_id = u.userID");
                 sql.append(" WHERE u.userID = ?");
-                params.add(Optional.of(currentUserID));
+                params.add(currentUserID);
             } else {
                 sql.append(" WHERE 1=1");
             }
 
             // Add filters if present
-            if (filterList.containsKey("make")) {
+            if (filterList.get("make") != null && !filterList.get("make").isBlank()) {
                 sql.append(" AND v.V_make LIKE ?");
                 params.add("%" + filterList.get("make") + "%");
             }
 
-            if (filterList.containsKey("model")) {
+            if (filterList.get("model") != null && !filterList.get("model").isBlank()) {
                 sql.append(" AND v.V_model LIKE ?");
                 params.add("%" + filterList.get("model") + "%");
             }
 
-            if (filterList.containsKey("year")) {
+            if (filterList.get("year") != null && !filterList.get("year").isBlank()) {
                 sql.append(" AND v.V_year = ?");
-                params.add(filterList.get("year"));
+                params.add(Integer.parseInt(filterList.get("year")));
             }
 
             // Executes SQL command based on filters applied
@@ -616,16 +604,12 @@ public class VINDecoderMain {
                     results.add(vehicle);
                 }
             }
-
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(mainView,"Could not establish connection with NHTSA API!", "NHTSA Error!", JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();
         }
-
         return results;
     }
-
-
 
     // Helper method that grabs vehicles that match the filters the user applied
     private ArrayList<Vehicle> getFilteredNHTSAVehicles(Map<String, String> filterList) {
@@ -706,15 +690,10 @@ public class VINDecoderMain {
             System.err.println("Failed to retrieve data from NHTSA: " + e.getMessage());
             e.printStackTrace();
         }
-
         return results;
     }
 
-
-
-
-
-
+    // Method to convert a temporary vehicle object to a permanent vehicle object
     public Vehicle solidifyVehicle(Vehicle tempVehicle) {
 
         // Use VIN in search
@@ -757,10 +736,9 @@ public class VINDecoderMain {
             String gvwr = getValue(results, "GVWR (Gross Vehicle Weight Rating)");
             int seatRows = parseInt(getValue(results, "Number of Seat Rows")); // Substitute if needed
             int seats = parseInt(getValue(results, "Seats"));
-            //System.out.println(results.toString(2));
 
             Vehicle permVehicle = new Vehicle(tempVehicle.getVIN(), tempVehicle.getNickname(), tempVehicle.getMake(),
-                    tempVehicle.getModel(), tempVehicle.getYear(), false, trim, vehicleType, bodyClass, doors, fuelTypePrimary,
+                    tempVehicle.getModel(), tempVehicle.getYear(), tempVehicle.getSaved(), trim, vehicleType, bodyClass, doors, fuelTypePrimary,
                     driveType, engineModel, engineCylinders, displacement, transmissionStyle, transmissionSpeeds, plantCountry,
                     manufacturer, gvwr, seatRows,
                     seats);
@@ -774,89 +752,89 @@ public class VINDecoderMain {
         }
     }
 
+    // Save a vehicle to the mySQL database associated with the user
+    public boolean saveVehicle(Vehicle vehicle, int userId) {
+        // First verify required fields
+        if (vehicle.getVIN() == null || vehicle.getVIN().isEmpty()) {
+            System.out.println("Cannot save vehicle: VIN is required");
+            return false;
+        }
 
-
-    // TODO (+HOLDEN) (+SAUL): WRITE LOGIC TO SAVE VEHICLE OBJECT TO MYSQL
-    public void saveVehicle(Vehicle vehicle, int userId) {
-
-        String insertSql = "INSERT INTO vehicles (VIN_NUMBER, userID, nickname, V_make, V_model, V_year, trim, vehicleType, bodyClass, doors, fuelTypePrimary, driveType, engineModel, engineCylinders, displacementL, transmissionStyle, transmissionSpeed, plantCountry, manufacturer, GVWR, seatRows, seats) " +
+        String insertSql = "INSERT INTO vehicles (VIN_NUMBER, userID, nickname, V_make, V_model, V_year, " +
+                "V_trim, V_type, V_bodyClass, V_doors, V_fuelType, V_DriveType, V_EngineModel, " +
+                "V_CylinderNum, V_EngineDisplace, V_TransStyle, V_TransSpeeds, V_PlantCountry, " +
+                "V_Manufacturer, V_GVWR, V_rows, V_seats) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD);
-             PreparedStatement stmt = conn.prepareStatement(insertSql)) {
+        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD)) {
+            conn.setAutoCommit(false);
 
-            stmt.setString(1, vehicle.getVIN());
-            stmt.setInt(2, userId);
-            stmt.setString(3, vehicle.getNickname());
-            stmt.setString(4, vehicle.getMake());
-            stmt.setString(5, vehicle.getModel());
-            stmt.setInt(6, vehicle.getYear());
-            stmt.setString(7, vehicle.getTrim());
-            stmt.setString(8, vehicle.getVehicleType());
-            stmt.setString(9, vehicle.getBodyClass());
-            stmt.setInt(10, vehicle.getDoors());
-            stmt.setString(11, vehicle.getFuelTypePrimary());
-            stmt.setString(12, vehicle.getDriveType());
-            stmt.setString(13, vehicle.getEngineModel());
-            stmt.setInt(14, vehicle.getEngineCylinder());
-            stmt.setDouble(15, vehicle.getDisplacementL());
-            stmt.setString(16, vehicle.getTransmissionStyle());
-            stmt.setInt(17, vehicle.getTransmissionSpeed());
-            stmt.setString(18, vehicle.getPlantCountry());
-            stmt.setString(19, vehicle.getManufacturer());
-            stmt.setString(20, vehicle.getGvwr());
-            stmt.setInt(21, vehicle.getSeatRows());
-            stmt.setInt(22, vehicle.getSeats());
+            try (PreparedStatement stmt = conn.prepareStatement(insertSql)) {
+                // Set all parameters with null checks
+                stmt.setString(1, vehicle.getVIN());
+                stmt.setInt(2, userId);
+                stmt.setString(3, vehicle.getNickname() != null ? vehicle.getNickname() : "");
+                stmt.setString(4, vehicle.getMake() != null ? vehicle.getMake() : "");
+                stmt.setString(5, vehicle.getModel() != null ? vehicle.getModel() : "");
+                stmt.setInt(6, vehicle.getYear());
+                stmt.setString(7, vehicle.getTrim() != null ? vehicle.getTrim() : "");
+                stmt.setString(8, vehicle.getVehicleType() != null ? vehicle.getVehicleType() : "");
+                stmt.setString(9, vehicle.getBodyClass() != null ? vehicle.getBodyClass() : "");
+                stmt.setInt(10, vehicle.getDoors());
+                stmt.setString(11, vehicle.getFuelTypePrimary() != null ? vehicle.getFuelTypePrimary() : "");
+                stmt.setString(12, vehicle.getDriveType() != null ? vehicle.getDriveType() : "");
+                stmt.setString(13, vehicle.getEngineModel() != null ? vehicle.getEngineModel() : "");
+                stmt.setInt(14, vehicle.getEngineCylinder());
+                stmt.setDouble(15, vehicle.getDisplacementL());
+                stmt.setString(16, vehicle.getTransmissionStyle() != null ? vehicle.getTransmissionStyle() : "");
+                stmt.setInt(17, vehicle.getTransmissionSpeed());
+                stmt.setString(18, vehicle.getPlantCountry() != null ? vehicle.getPlantCountry() : "");
+                stmt.setString(19, vehicle.getManufacturer() != null ? vehicle.getManufacturer() : "");
+                stmt.setString(20, vehicle.getGvwr() != null ? vehicle.getGvwr() : "");
+                stmt.setInt(21, vehicle.getSeatRows());
+                stmt.setInt(22, vehicle.getSeats());
 
-            int rowsInserted = stmt.executeUpdate();
-            if (rowsInserted > 0) {
-                System.out.println("Vehicle saved successfully.");
-            } else {
-                System.out.println("Vehicle save failed.");
+                int rowsAffected = stmt.executeUpdate();
+
+                if (rowsAffected > 0) {
+                    conn.commit();
+                    vehicle.setIsSaved(true);
+                    return true;
+                } else {
+                    conn.rollback();
+                    return false;
+                }
+            } catch (SQLException e) {
+                conn.rollback();
+                System.out.println("Error saving vehicle: " + e.getMessage());
+                return false;
+            } finally {
+                conn.setAutoCommit(true);
             }
-
         } catch (SQLException e) {
-            System.out.println("SQL error while saving vehicle:");
-            e.printStackTrace();
+            System.out.println("Database connection error: " + e.getMessage());
+            return false;
         }
     }
 
-
-
-    // TODO (+HOLDEN) (+SAUL): WRITE LOGIC TO REMOVE VEHICLE OBJECT FROM MYSQL
-    public void removeVehicle(Vehicle vehicle, int userId) {
-
+    // Removes vehicle from mySQL and any association to the user
+    public boolean removeVehicle(Vehicle vehicle, int userId) {
+        // Since we have ON DELETE CASCADE in the database, we only need to delete from vehicles
         String deleteSql = "DELETE FROM vehicles WHERE VIN_NUMBER = ? AND userID = ?";
 
-        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD);
-             PreparedStatement stmt = conn.prepareStatement(deleteSql)) {
+        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD)) {
+            try (PreparedStatement stmt = conn.prepareStatement(deleteSql)) {
+                stmt.setString(1, vehicle.getVIN());
+                stmt.setInt(2, userId);
 
-            stmt.setString(1, vehicle.getVIN());
-            stmt.setInt(2, userId);
-
-            int rowsDeleted = stmt.executeUpdate();
-
-            if (rowsDeleted > 0) {
-                System.out.println("Vehicle removed successfully.");
-            } else {
-                System.out.println("No matching vehicle found to delete.");
+                int rowsAffected = stmt.executeUpdate();
+                return rowsAffected > 0;
             }
-
         } catch (SQLException e) {
-            System.out.println("SQL error while removing vehicle:");
-            e.printStackTrace();
+            System.out.println("Error removing vehicle: " + e.getMessage());
+            return false;
         }
     }
-
-
-
-    // TODO (+HOLDEN): WRITE GUI LOGIC TO OPEN A TEXT BOX AND TAKE USER INPUT FROM A RESULTING PROMPT BOX
-    public void editName(Vehicle vehicle) {
-        String newName = "new name";
-        vehicle.setNickname(newName);
-    }
-
-
 
     public static void main(String[] args) {
         VINDecoderMain decoder = new VINDecoderMain();

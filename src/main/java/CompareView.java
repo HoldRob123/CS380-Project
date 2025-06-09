@@ -1,14 +1,15 @@
-
-
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.util.HashMap;
+import java.util.Map;
 
 public class CompareView extends JFrame {
     private JTextField searchField;
     private JTextArea vehicleADescArea;
     private JTextArea vehicleBDescArea;
+    private JPanel filterPanel;
+    private JComboBox<String> gasType;
+    private JTextField yearField, makeField, modelField;
     private final VINDecoderCompare controller;
 
     public CompareView(VINDecoderCompare controller) {
@@ -19,51 +20,92 @@ public class CompareView extends JFrame {
     private void setupUI() {
         setTitle("Compare View");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setSize(1000, 600);
-        setLocationRelativeTo(null);
+        setSize(1200, 700);
         setLayout(new BorderLayout());
 
-        // Top Panel with buttons
+        // Top panel with back button and action buttons
         JPanel topPanel = new JPanel(new BorderLayout());
-
-        // Back button
         JButton backButton = new JButton("← Back");
         backButton.addActionListener(e -> controller.returnToMainView());
         topPanel.add(backButton, BorderLayout.WEST);
 
-        // Button panel for right side
-        JPanel buttonPanel = new JPanel(new FlowLayout());
-
-        // Reselect button
-        JButton reselectButton = new JButton("Reselect Vehicle B");
-        reselectButton.addActionListener(e -> controller.reselectVehicleB());
-        buttonPanel.add(reselectButton);
-
-        // Analyze button
+        // Button panel
+        JPanel buttonPanel = new JPanel();
         JButton analyzeButton = new JButton("Analyze Comparison");
         analyzeButton.addActionListener(e -> controller.performComparison());
         buttonPanel.add(analyzeButton);
-
         topPanel.add(buttonPanel, BorderLayout.EAST);
+
         add(topPanel, BorderLayout.NORTH);
 
-        // Search panel
+        // Filter panel (initially hidden)
+        filterPanel = new JPanel(new GridLayout(0, 2, 5, 5));
+        filterPanel.setBorder(BorderFactory.createTitledBorder("Filters"));
+        filterPanel.setVisible(false);
+
+        yearField = new JTextField();
+        makeField = new JTextField();
+        modelField = new JTextField();
+        gasType = new JComboBox<>(new String[]{"", "Gasoline", "Diesel", "Electric", "Hybrid"});
+
+        filterPanel.add(new JLabel("Year:"));
+        filterPanel.add(yearField);
+        filterPanel.add(new JLabel("Make:"));
+        filterPanel.add(makeField);
+        filterPanel.add(new JLabel("Model:"));
+        filterPanel.add(modelField);
+        filterPanel.add(new JLabel("Fuel Type:"));
+        filterPanel.add(gasType);
+
+        // Search panel with toggle filter button
         JPanel searchPanel = new JPanel(new BorderLayout());
         searchField = new JTextField();
-        JButton searchButton = new JButton("Search");
-        searchButton.addActionListener(e -> controller.handleSearch(searchField.getText()));
-        searchPanel.add(searchField, BorderLayout.CENTER);
-        searchPanel.add(searchButton, BorderLayout.EAST);
-        add(searchPanel, BorderLayout.SOUTH);
 
-        // Comparison Panel
+        JButton searchButton = new JButton("Search");
+        searchButton.addActionListener(e -> performSearch());
+
+        JButton toggleFilterButton = new JButton("Filters ▼");
+        toggleFilterButton.addActionListener(e -> {
+            filterPanel.setVisible(!filterPanel.isVisible());
+            toggleFilterButton.setText(filterPanel.isVisible() ? "Filters ▲" : "Filters ▼");
+            pack();
+        });
+
+        JPanel searchControls = new JPanel(new BorderLayout());
+        searchControls.add(searchButton, BorderLayout.EAST);
+        searchControls.add(toggleFilterButton, BorderLayout.WEST);
+
+        searchPanel.add(searchField, BorderLayout.CENTER);
+        searchPanel.add(searchControls, BorderLayout.EAST);
+
+        JPanel southPanel = new JPanel(new BorderLayout());
+        southPanel.add(searchPanel, BorderLayout.NORTH);
+        southPanel.add(filterPanel, BorderLayout.CENTER);
+        add(southPanel, BorderLayout.SOUTH);
+
+        // Comparison panels
         JPanel comparisonPanel = new JPanel(new GridLayout(1, 2));
         vehicleADescArea = createDescriptionArea("Vehicle A");
         vehicleBDescArea = createDescriptionArea("Vehicle B (Select a vehicle to compare)");
-
         comparisonPanel.add(new JScrollPane(vehicleADescArea));
         comparisonPanel.add(new JScrollPane(vehicleBDescArea));
         add(comparisonPanel, BorderLayout.CENTER);
+    }
+
+    private void performSearch() {
+        Map<String, String> filters = new HashMap<>();
+        filters.put("year", yearField.getText().trim());
+        filters.put("make", makeField.getText().trim());
+        filters.put("model", modelField.getText().trim());
+        filters.put("fuel", gasType.getSelectedItem().toString());
+
+        String query = searchField.getText().trim();
+
+        if (!query.isEmpty()) {
+            controller.handleSearch(query, filters);
+        } else {
+            controller.handleFilterSearch(filters);
+        }
     }
 
     private JTextArea createDescriptionArea(String title) {
@@ -97,7 +139,7 @@ public class CompareView extends JFrame {
         textArea.setFont(new Font("Monospaced", Font.PLAIN, 12));
 
         JScrollPane scrollPane = new JScrollPane(textArea);
-        scrollPane.setPreferredSize(new Dimension(900, 400));
+        scrollPane.setPreferredSize(new Dimension(1200, 700));
 
         JOptionPane.showMessageDialog(this, scrollPane, "Comparison Result", JOptionPane.PLAIN_MESSAGE);
     }

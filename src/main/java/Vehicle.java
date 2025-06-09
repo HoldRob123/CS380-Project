@@ -8,9 +8,9 @@ public class Vehicle {
     private String make;
     private String model;
     private int year;
+    private Boolean isSaved;
 
     // Non-Essential Fields
-    private Boolean isSaved;
     private String trim;
     private String vehicleType;
     private String bodyClass;
