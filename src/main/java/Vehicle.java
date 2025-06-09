@@ -1,4 +1,5 @@
 
+
 public class Vehicle {
 
     // Essential Fields
@@ -7,9 +8,9 @@ public class Vehicle {
     private String make;
     private String model;
     private int year;
+    private Boolean isSaved;
 
     // Non-Essential Fields
-    private Boolean isSaved;
     private String trim;
     private String vehicleType;
     private String bodyClass;
@@ -151,7 +152,7 @@ public class Vehicle {
         sb.append("Year: ").append(year).append("\n");
         sb.append("Saved: ").append(isSaved != null && isSaved ? "Yes" : "No").append("\n");
         sb.append("Trim: ").append(trim == null ? "N/A" : trim).append("\n");
-        sb.append("GUIFiles.Vehicle Type: ").append(vehicleType == null ? "N/A" : vehicleType).append("\n");
+        sb.append("Vehicle Type: ").append(vehicleType == null ? "N/A" : vehicleType).append("\n");
         sb.append("Body Class: ").append(bodyClass == null ? "N/A" : bodyClass).append("\n");
         sb.append("Doors: ").append(doors).append("\n");
         sb.append("Fuel Type: ").append(fuelTypePrimary == null ? "N/A" : fuelTypePrimary).append("\n");

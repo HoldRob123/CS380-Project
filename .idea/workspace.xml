@@ -5,21 +5,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="88dd8be3-de38-498f-b64f-c57ba0bfd690" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/CompareView.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/CompareView.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/LoginScreen.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/LoginScreen.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/MainView.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/MainView.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/VINDecoderCompare.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/VINDecoderCompare.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/VINDecoderMain.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/VINDecoderMain.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Vehicle.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Vehicle.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/CompareView$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/CompareView$1.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/CompareView.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/CompareView.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/MainView.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/MainView.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/VINDecoderCompare.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/VINDecoderCompare.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/VINDecoderMain$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/VINDecoderMain$1.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/VINDecoderMain.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/VINDecoderMain.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/Vehicle.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/Vehicle.class" afterDir="false" />
     </list>
+    <list id="681fe4f7-b15f-4b9c-9c39-50624c18cfb6" name="Changes by holde" comment="" />
+    <list id="5de35d88-f412-44b7-a22a-cef47c303745" name="Changes by isaka" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -33,6 +25,11 @@
     </option>
   </component>
   <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="VM-version" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="GitHubPullRequestSearchHistory">{
@@ -41,12 +38,12 @@
     &quot;assignee&quot;: &quot;jacobhasason&quot;
   }
 }</component>
-  <component name="GithubPullRequestsUISettings">{
-  &quot;selectedUrlAndAccountId&quot;: {
-    &quot;url&quot;: &quot;https://github.com/HoldRob123/CS380-Project.git&quot;,
-    &quot;accountId&quot;: &quot;4bd5bb21-e18a-47f7-bb00-85b0a0a68f4b&quot;
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/HoldRob123/CS380-Project.git",
+    "accountId": "bdcf836b-9ed3-4555-95c3-565904a732b6"
   }
-}</component>
+}]]></component>
   <component name="ProjectColorInfo">{
   &quot;customColor&quot;: &quot;&quot;,
   &quot;associatedIndex&quot;: 3
@@ -56,35 +53,65 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Application.Sandbox.executor": "Run",
-    "Application.VINDecoderMain.executor": "Run",
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "main",
-    "kotlin-language-version-configured": "true",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Application.Sandbox.executor&quot;: &quot;Run&quot;,
+    &quot;Application.VINDecoderMain.executor&quot;: &quot;Run&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;VM-version&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\isaka\OneDrive\Documents\GitHub\cs380project\src\main\resources" />
+      <recent name="C:\Users\isaka\OneDrive\Documents\GitHub\CS380-Project" />
+      <recent name="C:\Users\isaka\OneDrive\Documents\GitHub\CS380-Project\src\main" />
+      <recent name="C:\Users\isaka\OneDrive\Documents\GitHub\CS380-Project\src\main\resources" />
       <recent name="C:\Users\isaka\OneDrive\Documents\GitHub\cs380project\src\main\java\textfiles" />
-      <recent name="C:\Users\isaka\OneDrive\Documents\GitHub\cs380project\src\main\java" />
-      <recent name="C:\Users\isaka\OneDrive\Documents\GitHub\cs380project\textfiles" />
     </key>
+  </component>
+  <component name="RunManager">
+    <configuration name="Sandbox" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="Sandbox" />
+      <module name="cs380project" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="VINDecoderMain" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="VINDecoderMain" />
+      <module name="cs380project" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Application.VINDecoderMain" />
+        <item itemvalue="Application.Sandbox" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-jdk-9f38398b9061-18abd8497189-intellij.indexing.shared.core-IU-241.14494.240" />
-        <option value="bundled-js-predefined-1d06a55b98c1-74d2a5396914-JavaScript-IU-241.14494.240" />
+        <option value="bundled-jdk-9823dce3aa75-fbdcb00ec9e3-intellij.indexing.shared.core-IU-251.26094.121" />
+        <option value="bundled-js-predefined-d6986cc7102b-b26f3e71634d-JavaScript-IU-251.26094.121" />
       </set>
     </attachedChunks>
   </component>
@@ -98,6 +125,11 @@
       <updated>1748981404458</updated>
       <workItem from="1749083157565" duration="39000" />
       <workItem from="1749083257541" duration="19248000" />
+      <workItem from="1749241757588" duration="157000" />
+      <workItem from="1749241937193" duration="1383000" />
+      <workItem from="1749243355420" duration="249000" />
+      <workItem from="1749243625544" duration="16119000" />
+      <workItem from="1749462947549" duration="333000" />
     </task>
     <servers />
   </component>

@@ -1,4 +1,4 @@
-//
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -12,20 +12,20 @@ public class LoginScreen extends JFrame {
 
     public LoginScreen(VINDecoderMain mainSystem) {
         this.mainSystem = mainSystem;
-        setTitle("vBreed Login");
+        setTitle("VBG Go! Login");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setSize(400, 250);
+        setSize(450, 250);
         setLocationRelativeTo(null);
 
         JPanel panel = new JPanel(null);
 
-        JLabel titleLabel = new JLabel("vBreed");
+        JLabel titleLabel = new JLabel("VBG Go!");
         titleLabel.setFont(new Font("Serif", Font.BOLD, 20));
         titleLabel.setBounds(160, 10, 100, 30);
         panel.add(titleLabel);
 
         JLabel instruction = new JLabel("Type in existing account credentials or log new credentials below:");
-        instruction.setBounds(20, 40, 360, 20);
+        instruction.setBounds(20, 40, 400, 20);
         panel.add(instruction);
 
         JLabel usernameLabel = new JLabel("Username:");
@@ -55,9 +55,23 @@ public class LoginScreen extends JFrame {
 
         add(panel);
 
-        guestButton.addActionListener(e -> goToMainScreen());
+        guestButton.addActionListener(e -> loginAsGuest());
         confirmButton.addActionListener(e -> attemptLogin());
     }
+
+    private void loginAsGuest(){
+        String guestUsername = "Guest";
+        String guestPassword = "guest";
+
+        String attemptLog = mainSystem.tryLogin(guestUsername, guestPassword);
+
+        if (attemptLog.equals("Login Successful!") || attemptLog.equals("Account Created!")) {
+            goToMainScreen();
+        }else {
+            JOptionPane.showMessageDialog(this, attemptLog, "Guest Login Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
 
     private void attemptLogin() {
         String username = usernameField.getText().trim();
