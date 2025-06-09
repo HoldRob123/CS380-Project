@@ -35,7 +35,6 @@ public class VINDecoderMain {
 
     // GUI References
     private LoginScreen loginScreen;
-    private CompareView compareView;
     public MainView mainView;
     private VehicleLibrary vehicleLibrary = new VehicleLibrary();
 
@@ -198,10 +197,7 @@ public class VINDecoderMain {
 
         if (mainView.getSavedOnly().isSelected()) {
             filters.put("savedOnly", "true");
-            System.out.println(currentUserID);
         }
-
-        System.out.println("Filter List: " + filters);
 
         JPanel resultPanel = mainView.getResultPanel();
         resultPanel.removeAll();
@@ -547,7 +543,6 @@ public class VINDecoderMain {
 
             // If "savedOnly" is in the filter list, get the current user's ID
             if (filterList.containsKey("savedOnly")) {
-                System.out.println("Hello");
                 String userIdQuery = "SELECT userID FROM users WHERE userName = ?";
                 try (PreparedStatement userStmt = conn.prepareStatement(userIdQuery)) {
                     userStmt.setString(1, currentUser);
