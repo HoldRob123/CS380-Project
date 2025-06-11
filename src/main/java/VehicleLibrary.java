@@ -16,6 +16,12 @@ public class VehicleLibrary {
                             "continues its reign as America's best-selling vehicle for the 43rd consecutive year. Renowned for its durability and versatility, \n" +
                             "the F-Series offers a range of powertrains, including hybrid and electric options like the F-150 Lightning. \n" +
                             "Its impressive towing capacity and advanced tech features make it a favorite among both commercial and personal users. \n";
+                } else if (model.equals("FUSION")) {
+                    return "The Ford Fusion is a mid-size sedan that was produced from 2006 to 2020, known for its balanced ride, comfortable interior, \n" +
+                            "and solid fuel economy. It offered a range of powertrains, including hybrid and plug-in hybrid versions, appealing to eco-conscious drivers. \n" +
+                            "The Fusion stood out for its sporty handling and sharp exterior design, especially in later model years. \n" +
+                            "Inside, it featured user-friendly tech like the SYNC infotainment system and available advanced safety options. Though discontinued, \n" +
+                            "the Fusion remains a popular choice on the used market due to its reliability and value.\n";
                 }
                 break;
 

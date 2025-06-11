@@ -94,7 +94,7 @@ public class VINDecoderCompare {
         String yrComp = vehicleA.getYear() >= vehicleB.getYear() ? "younger" : "older";
         int yrDiff = Math.abs(vehicleA.getYear() - vehicleB.getYear());
         result.append("The " + vehicleA.getMake() + " " + vehicleA.getModel() + " is " + yrDiff + " years " + yrComp +
-                " than the " + vehicleB.getMake() + " " +vehicleB.getYear() + "!\n");
+                " than the " + vehicleB.getMake() + " " +vehicleB.getModel() + "!\n");
 
         //Weight
         if(!vehicleA.getGvwr().equals("") && !vehicleB.getGvwr().equals("")) {
@@ -103,14 +103,14 @@ public class VINDecoderCompare {
             String weComp = aLowGvwr > bLowGvwr ? "heavier" : "lighter";
             int weDiff = Math.abs(aLowGvwr - bLowGvwr);
             result.append("The " + vehicleA.getMake() + " " + vehicleA.getModel() + " is " + weDiff + " pounds " + weComp +
-                    " than the " + vehicleB.getMake() + " " + vehicleB.getYear() + "!\n");
+                    " than the " + vehicleB.getMake() + " " + vehicleB.getModel() + "!\n");
         }
 
         //Body Class
-        if(vehicleA.getBodyClass() != null && vehicleB.getBodyClass() != null) {
+        if(!vehicleA.getBodyClass().equals("null") && !vehicleB.getBodyClass().equals("null")) {
             if(!vehicleA.getBodyClass().equals(vehicleB.getBodyClass())) {
-                result.append("The " + vehicleA.getMake() + " " + vehicleA.getModel() + " has " + vehicleA.getBodyClass() + " whereas the "
-                        + vehicleB.getMake() + " " + vehicleB.getYear() + " has " + vehicleB.getBodyClass() + "!\n");
+                result.append("The " + vehicleA.getMake() + " " + vehicleA.getModel() + " is a " + vehicleA.getBodyClass() + " whereas the "
+                        + vehicleB.getMake() + " " + vehicleB.getModel() + " is a " + vehicleB.getBodyClass() + "!\n");
             }
         }
 
@@ -119,14 +119,14 @@ public class VINDecoderCompare {
             String disComp = vehicleA.getDisplacementL() >= vehicleB.getDisplacementL() ? "higher" : "lower";
             double disDiff = Math.abs(vehicleA.getDisplacementL() - vehicleB.getDisplacementL());
             result.append("The " + vehicleA.getMake() + " " + vehicleA.getModel() + " has " + disDiff + "L " + disComp +
-                    " displacement than the " + vehicleB.getMake() + " " + vehicleB.getYear() + "!\n\n");
+                    " displacement than the " + vehicleB.getMake() + " " + vehicleB.getModel() + "!\n\n");
         }
 
         //Drive Type
-        if(vehicleA.getDriveType() != null && vehicleB.getDriveType() != null) {
+        if(!vehicleA.getDriveType().equals("null") && !vehicleB.getDriveType().equals("null")) {
             if(!vehicleA.getDriveType().equals(vehicleB.getDriveType())) {
                 result.append("The " + vehicleA.getMake() + " " + vehicleA.getModel() + " has " + vehicleA.getDriveType() + " whereas the "
-                        + vehicleB.getMake() + " " + vehicleB.getYear() + " has " + vehicleB.getDriveType() + "!\n");
+                        + vehicleB.getMake() + " " + vehicleB.getModel() + " has " + vehicleB.getDriveType() + "!\n");
             }
         }
 

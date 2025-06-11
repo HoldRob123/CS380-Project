@@ -37,6 +37,7 @@ public class VINDecoderMain {
     private LoginScreen loginScreen;
     public MainView mainView;
     private VehicleLibrary vehicleLibrary = new VehicleLibrary();
+    private Random r = new Random();
 
     public MainView getMainView() {
         return mainView;
@@ -44,7 +45,8 @@ public class VINDecoderMain {
 
     // Starts VINDecoder Main
     public void run() {
-        String input = "C:\\Users\\cwu\\Documents\\GitHub\\CS380-Project\\src\\main\\resources\\vinresults.txt";
+        // If this comment is above input - change to cwu
+        String input = "C:\\Users\\isaka\\OneDrive\\Documents\\GitHub\\cs380project\\src\\main\\resources\\vinresults.txt";
         loadCachedVehicles(input);
 
         // Launches Login Page
@@ -676,7 +678,8 @@ public class VINDecoderMain {
                 }
                 // Gets a realistic year if none is specified
                 int year = sYear.isEmpty() ? vehicleLibrary.getRealisticYear(nhtsaMake) : Integer.parseInt(sYear);
-                Vehicle temp = new Vehicle("<VIN UNKNOWN>", "N/A", nhtsaMake, nhtsaModel, year, false);
+                String unknownVIN = "Unknown-" + r.nextInt(999999999);
+                Vehicle temp = new Vehicle(unknownVIN, "N/A", nhtsaMake, nhtsaModel, year, false);
                 temp.setIsSaved(false);
                 results.add(temp);
             }
